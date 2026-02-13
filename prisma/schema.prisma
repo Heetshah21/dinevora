@@ -1,0 +1,272 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//// MULTI-TENANCY CORE ////////////////////////////////////////////////////////
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  timezone  String   @default("UTC")
+  locale    String   @default("en-US")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  restaurants Restaurant[]
+  menuCategories MenuCategory[]
+  menuItems MenuItem[]
+  orderItems OrderItem[]
+  customers   Customer[]
+  orders      Order[]
+  payments    Payment[]
+}
+
+//// RESTAURANTS & MENU ////////////////////////////////////////////////////////
+
+model Restaurant {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  name      String
+  slug      String
+  timezone  String?
+  address   String?
+  city      String?
+  country   String?
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  menuCategories MenuCategory[]
+  menuItems      MenuItem[]
+  orders         Order[]
+
+  @@index([tenantId])
+  @@unique([tenantId, slug])
+}
+
+enum MenuItemType {
+  FOOD
+  DRINK
+  ADDON
+}
+
+model MenuCategory {
+  id           String      @id @default(cuid())
+  tenantId     String
+  restaurantId String
+
+  tenant       Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  name         String
+  description  String?
+  position     Int         @default(0)
+  isActive     Boolean     @default(true)
+
+  menuItems    MenuItem[]
+
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([tenantId, restaurantId])
+  @@unique([tenantId, restaurantId, name])
+}
+
+model MenuItem {
+  id           String        @id @default(cuid())
+  tenantId     String
+  restaurantId String
+  categoryId   String?
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  category     MenuCategory? @relation(fields: [categoryId], references: [id])
+
+  name         String
+  description  String?
+  sku          String?
+  price        Decimal       
+  currency     String        @default("USD")
+  type         MenuItemType  @default(FOOD)
+  isAvailable  Boolean       @default(true)
+  position     Int           @default(0)
+
+  imageUrl     String?
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+
+  orderItems   OrderItem[]
+
+  @@index([tenantId, restaurantId])
+  @@index([tenantId, isAvailable])
+  @@unique([tenantId, restaurantId, sku])
+}
+
+//// CUSTOMERS /////////////////////////////////////////////////////////////////
+
+model Customer {
+  id         String   @id @default(cuid())
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  email      String?
+  phone      String?
+  name       String?
+
+  externalId String?
+  notes      String?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orders     Order[]
+
+  @@index([tenantId, email])
+  @@index([tenantId, phone])
+}
+
+//// ORDERS & ORDER ITEMS //////////////////////////////////////////////////////
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum OrderSource {
+  IN_STORE
+  ONLINE
+  DELIVERY
+  KIOSK
+}
+
+model Order {
+  id           String       @id @default(cuid())
+  tenantId     String
+  restaurantId String
+  customerId   String?
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  customer     Customer?    @relation(fields: [customerId], references: [id])
+
+  status       OrderStatus  @default(PENDING)
+  source       OrderSource  @default(ONLINE)
+
+  subtotal     Decimal      
+  tax          Decimal      
+  discount     Decimal      @default(0)
+  total        Decimal      
+  currency     String       @default("USD")
+
+  placedAt     DateTime     @default(now())
+  confirmedAt  DateTime?
+  fulfilledAt  DateTime?
+  cancelledAt  DateTime?
+  cancellationReason String?
+
+  notes        String?
+  tableNumber  String?
+  orderCode    String?
+  externalId   String?
+
+  items        OrderItem[]
+  payments     Payment[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([tenantId, restaurantId, placedAt])
+  @@index([tenantId, status, placedAt])
+  @@index([tenantId, customerId, placedAt])
+  @@index([tenantId, orderCode])
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  tenantId     String
+  orderId      String
+  menuItemId   String?
+
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem     MenuItem? @relation(fields: [menuItemId], references: [id])
+
+  name         String
+  sku          String?
+  unitPrice    Decimal  
+  quantity     Int
+  totalPrice   Decimal  
+
+  notes        String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([tenantId, orderId])
+}
+
+//// PAYMENTS /////////////////////////////////////////////////////////////////
+
+enum PaymentStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+  WALLET
+  OTHER
+}
+
+model Payment {
+  id           String        @id @default(cuid())
+  tenantId     String
+  orderId      String
+
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  order        Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  status       PaymentStatus @default(PENDING)
+  method       PaymentMethod
+
+  amount       Decimal       
+  currency     String        @default("USD")
+
+  provider     String?
+  providerPaymentId String?  @unique
+  providerChargeId  String?
+  providerRefundId  String?
+
+  metadata     Json?
+
+  paidAt       DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([tenantId, orderId])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+}
+
