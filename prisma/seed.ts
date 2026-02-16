@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -42,6 +43,21 @@ async function main() {
       },
     ],
   });
+// ✅ OWNER USER (VERY IMPORTANT)
+
+const hashedPassword = await bcrypt.hash("owner123", 10);
+
+await prisma.user.create({
+  data: {
+    email: "owner@dinevora.com",
+    name: "Demo Owner",
+    password: hashedPassword,
+    role: "OWNER",
+    tenantId: tenant.id,
+  },
+});
+
+console.log("✅ Owner user created");
 
   console.log("✅ Database seeded successfully");
 }
