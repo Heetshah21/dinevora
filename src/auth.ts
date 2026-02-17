@@ -3,7 +3,21 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import bcrypt from "bcrypt";
-import { headers } from "next/headers";
+
+declare module "next-auth" {
+  interface User {
+    role: string;
+    tenantId: string;
+  }
+
+  interface Session {
+    user: {
+      id: string;
+      role: string;
+      tenantId: string;
+    };
+  }
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
@@ -13,31 +27,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: {},
         password: {},
+        tenantSlug: {},
       },
 
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.email || !credentials?.password || !credentials?.tenantSlug) {
           return null;
         }
+        const tenantSlug = credentials?.tenantSlug;
+        if (!tenantSlug) return null;
 
-        // ✅ Get tenant slug from middleware header
-        const tenantSlug = "dinevora-demo"; // TEMP HARD-CODE
-
-
-        // ✅ Find tenant first
         const tenant = await db.tenant.findUnique({
           where: { slug: tenantSlug },
         });
 
         if (!tenant) return null;
 
-        // ✅ Now find user using COMPOSITE KEY
         const user = await db.user.findUnique({
           where: {
             email_tenantId: {
               email: credentials.email,
               tenantId: tenant.id,
             },
+          },
+          select: {
+            id: true,
+            email: true,
+            password: true,
+            role: true,
+            tenantId: true,
           },
         });
 
@@ -51,7 +69,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!valid) return null;
 
-        return user;
+        return {
+          id: user.id,
+          role: user.role,
+          tenantId: user.tenantId,
+        };
       },
     }),
   ],
@@ -71,12 +93,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.role = token.role;
-      session.user.tenantId = token.tenantId;
-      return session;
-    },
-  },
 
+      session.user = {
+        ...session.user,
+        id: token.id as string,
+        role: token.role as string,
+        tenantId: token.tenantId as string,
+      };
+    
+      return session;
+    }
+  },
   secret: process.env.NEXTAUTH_SECRET,
 });

@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { requireTenant } from "@/modules/tenant/tenant.service";
 
 export async function getTenant() {
-  const headersList = headers();
+  const headersList = await headers();
   const slug = headersList.get("x-tenant-slug");
 
   if (!slug) {
