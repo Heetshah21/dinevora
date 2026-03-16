@@ -49,7 +49,13 @@ export default async function TenantLayout({
           <Link href={`/${tenant}/orders`} style={{ color: "white" }}>
             Orders
           </Link>
-
+          <Link href={`/${tenant}/orders/history`} style={{ color: "white" }}>
+          Orders History
+          </Link>
+          <Link href={`/${tenant}/kitchen`} style={{ color: "white" }}>
+          Kitchen
+          </Link>
+          
           <Link href={`/${tenant}/settings`} style={{ color: "white" }}>
             Settings
           </Link>
