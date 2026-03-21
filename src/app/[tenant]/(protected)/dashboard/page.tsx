@@ -58,13 +58,14 @@ export default async function DashboardPage({ params }: Props) {
 
   return (
     <div>
-      <h1 style={{ marginBottom: "30px" }}>Dashboard</h1>
+      <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Dashboard</h1>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "20px",
+          gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+          gap: "16px",
+          alignItems: "stretch",
         }}
       >
         <Card title="Orders Today" value={ordersToday} />
@@ -80,19 +81,22 @@ function Card({ title, value }: any) {
   return (
     <div
       style={{
-        border: "1px solid #ddd",
+        border: "1px solid #e5e7eb",
         borderRadius: "10px",
-        padding: "24px",
+        padding: "20px",
         background: "white",
-        textAlign: "center",
-        minHeight: "110px"
+        minHeight: "110px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        boxSizing: "border-box",
       }}
     >
       <p
         style={{
-          color: "#777",
-          fontSize: "14px",
-          marginBottom: "8px",
+          color: "#6b7280",
+          fontSize: "13px",
+          margin: "0 0 8px",
         }}
       >
         {title}
@@ -100,9 +104,11 @@ function Card({ title, value }: any) {
 
       <h2
         style={{
-          fontSize: "36px",
-          fontWeight: "bold",
+          fontSize: "30px",
+          fontWeight: 700,
           margin: 0,
+          color: "#111827",
+          lineHeight: 1.1,
         }}
       >
         {value}

@@ -96,7 +96,12 @@ model Restaurant {
   orders         Order[]
   users          User[] 
   tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-
+  logoUrl        String?
+  currency       String   @default("INR")
+  taxPercent     Decimal  @default(0)
+  servicePercent Decimal  @default(0)
+  phone          String?
+  upiId          String?
   @@unique([tenantId, slug])
   @@index([tenantId])
 }

@@ -11,6 +11,8 @@ interface Props {
       price: string;
       description: string | null;
       isJainAvailable: boolean;
+      imageUrl: string | null;
+      isAvailable: boolean;
     };
   }
 
@@ -24,28 +26,58 @@ export default function MenuItemCard({ item, tenant }: Props) {
           await updateMenuItem(tenant, formData);
           setEditing(false);
         }}
+        encType="multipart/form-data"
         style={{
-          border: "1px solid #ddd",
-          padding: "10px",
+          border: "1px solid #e5e7eb",
+          padding: "14px",
           marginTop: "10px",
-          borderRadius: "8px",
-          
+          borderRadius: "10px",
+          background: "#fff",
         }}
       >
+        <input
+          name="name"
+          defaultValue={item.name}
+          required
+          style={{
+            marginRight: "8px",
+            padding: "10px 12px",
+            borderRadius: "8px",
+            border: "1px solid #d1d5db",
+            marginBottom: "8px",
+          }}
+        />
+        
         <input type="hidden" name="itemId" value={item.id} />
-  
-        <input name="name" defaultValue={item.name} />
-  
+        <div style={{ marginTop: "8px" }}>
+        <label>Update Image</label>
+        <br />
+        <input type="file" name="image" accept="image/*" />
+      </div>
+              
         <input
           name="price"
           type="number"
           step="0.01"
           defaultValue={item.price}
+          style={{
+            padding: "10px 12px",
+            borderRadius: "8px",
+            border: "1px solid #d1d5db",
+            marginBottom: "8px",
+            marginRight: "8px",
+          }}
         />
   
         <input
           name="description"
           defaultValue={item.description || ""}
+          style={{
+            padding: "10px 12px",
+            borderRadius: "8px",
+            border: "1px solid #d1d5db",
+            marginBottom: "8px",
+          }}
         />
   
         <label
@@ -68,6 +100,13 @@ export default function MenuItemCard({ item, tenant }: Props) {
           <button
             type="button"
             onClick={() => setEditing(false)}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "8px",
+              border: "1px solid #d1d5db",
+              background: "#fff",
+              cursor: "pointer",
+            }}
           >
             Cancel
           </button>
@@ -76,11 +115,12 @@ export default function MenuItemCard({ item, tenant }: Props) {
             type="submit"
             style={{
               marginLeft: "10px",
-              background: "green",
+              background: "#111827",
               color: "white",
               border: "none",
-              padding: "4px 10px",
-              borderRadius: "5px",
+              padding: "8px 12px",
+              borderRadius: "8px",
+              cursor: "pointer",
             }}
           >
             Save
@@ -93,32 +133,49 @@ export default function MenuItemCard({ item, tenant }: Props) {
   return (
     <div
       style={{
-        border: "1px solid #ddd",
-        padding: "10px",
+        border: "1px solid #e5e7eb",
+        padding: "14px",
         marginTop: "10px",
-        borderRadius: "8px",
+        borderRadius: "10px",
         opacity: item.isAvailable ? 1 : 0.5,
-        background: item.isAvailable ? "white" : "#f5f5f5",
+        background: item.isAvailable ? "white" : "#f9fafb",
       }}
     >
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-start",
+          gap: "12px",
+          flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <strong>{item.name}</strong> – ₹{item.price.toString()}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: "220px" }}>
+        {item.imageUrl && (
+          <img
+            src={item.imageUrl}
+            style={{
+              width: "56px",
+              height: "56px",
+              objectFit: "cover",
+              borderRadius: "8px",
+            }}
+          />
+        )}
+          <div>
+            <strong style={{ display: "block", marginBottom: "2px", color: "#111827" }}>{item.name}</strong>
+            <span style={{ color: "#374151", fontSize: "14px" }}>₹{item.price.toString()}</span>
+          </div>
 
           {item.isJainAvailable && (
             <span
               style={{
                 padding: "3px 8px",
-                background: "green",
-                color: "white",
+                background: "#ecfdf3",
+                color: "#166534",
                 borderRadius: "6px",
                 fontSize: "12px",
+                border: "1px solid #bbf7d0",
               }}
             >
               Jain Available
@@ -130,13 +187,13 @@ export default function MenuItemCard({ item, tenant }: Props) {
           <button
             onClick={() => setEditing(true)}
             style={{
-              padding: "4px 10px",
-              background: "#1976d2",
+              padding: "8px 12px",
+              background: "#111827",
               color: "white",
               border: "none",
-              borderRadius: "5px",
+              borderRadius: "8px",
               cursor: "pointer",
-              fontSize: "12px",
+              fontSize: "13px",
             }}
           >
             Edit
@@ -144,7 +201,7 @@ export default function MenuItemCard({ item, tenant }: Props) {
         </div>
       </div>
 
-      <p style={{ marginTop: "5px", color: "#555" }}>
+      <p style={{ margin: "10px 0 0", color: "#4b5563", fontSize: "14px" }}>
         {item.description}
       </p>
       <form
@@ -161,6 +218,7 @@ export default function MenuItemCard({ item, tenant }: Props) {
             alignItems: "center",
             gap: "6px",
             fontSize: "13px",
+            color: "#374151",
             }}
         >
             <input

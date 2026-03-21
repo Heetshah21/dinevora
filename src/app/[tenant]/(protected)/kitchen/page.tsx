@@ -35,13 +35,13 @@ export default async function KitchenPage({ params }: Props) {
 
   return (
     <div>
-      <h1 style={{ marginBottom: "30px" }}>Kitchen Board</h1>
+      <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Kitchen Board</h1>
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "20px",
+          gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
+          gap: "14px",
         }}
       >
         <Column title="Pending" orders={pending} tenant={tenant} />
@@ -55,59 +55,70 @@ export default async function KitchenPage({ params }: Props) {
 
 function Column({ title, orders, tenant }: any) {
   return (
-    <div>
-      <h2 style={{ marginBottom: "10px" }}>{title}</h2>
+    <div
+      style={{
+        border: "1px solid #e5e7eb",
+        borderRadius: "10px",
+        background: "#fff",
+        padding: "12px",
+        minHeight: "220px",
+      }}
+    >
+      <h2 style={{ margin: "0 0 10px", fontSize: "18px", color: "#111827" }}>{title}</h2>
 
       {orders.length === 0 && (
-        <p style={{ color: "#777" }}>No orders</p>
+        <p style={{ color: "#6b7280", margin: 0 }}>No orders</p>
       )}
 
       {orders.map((order: any) => (
         <div
           key={order.id}
           style={{
-            border: "1px solid #ddd",
-            padding: "10px",
+            border: "1px solid #e5e7eb",
+            padding: "12px",
             borderRadius: "8px",
             marginBottom: "10px",
             background: "white",
           }}
         >
-          <strong>#{order.id.slice(0, 6)}</strong>
+          <strong style={{ color: "#111827" }}>#{order.id.slice(0, 6)}</strong>
 
           {order.tableNumber && (
-            <p>Table {order.tableNumber}</p>
+            <p style={{ margin: "6px 0 0", fontSize: "14px", color: "#4b5563" }}>Table {order.tableNumber}</p>
           )}
 
-          <div style={{ marginTop: "5px" }}>
+          <div style={{ marginTop: "8px", display: "grid", gap: "4px" }}>
             {order.items.map((item: any) => (
-              <div key={item.id}>
+              <div key={item.id} style={{ fontSize: "14px", color: "#374151" }}>
                 {item.quantity}x {item.name}
               </div>
             ))}
           </div>
-          <div style={{ marginTop: "10px", display: "flex", gap: "6px" }}>
+          <div style={{ marginTop: "10px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
 
           {order.status === "PENDING" && (
           <>
             <form action={updateKitchenOrderStatus.bind(null, tenant, order.id, "CONFIRMED")}>
               <button type="submit" style={{
-              padding: "6px 12px",
-              background: "#2e7d32",
+              padding: "8px 12px",
+              background: "#111827",
               color: "white",
               border: "none",
-              borderRadius: "6px",
+              borderRadius: "8px",
               cursor: "pointer",
+              fontSize: "13px",
             }}>Accept</button>
             </form>
 
             <form action={updateKitchenOrderStatus.bind(null, tenant, order.id, "CANCELLED")}>
               <button type="submit" style={{
-              padding: "4px 10px",
-              background: "#b71c1c",
-              color: "white",
-              borderRadius: "6px",
-              fontSize: "12px",
+              padding: "8px 12px",
+              background: "#fff",
+              color: "#111827",
+              border: "1px solid #d1d5db",
+              borderRadius: "8px",
+              fontSize: "13px",
+              cursor: "pointer",
             }}>Decline</button>
             </form>
           </>
@@ -117,22 +128,25 @@ function Column({ title, orders, tenant }: any) {
           <>
             <form action={updateKitchenOrderStatus.bind(null, tenant, order.id, "IN_PROGRESS")}>
               <button type="submit" style={{
-              padding: "6px 12px",
-              background: "#2e7d32",
+              padding: "8px 12px",
+              background: "#111827",
               color: "white",
               border: "none",
-              borderRadius: "6px",
+              borderRadius: "8px",
               cursor: "pointer",
+              fontSize: "13px",
             }}>Start Cooking</button>
             </form>
 
             <form action={updateKitchenOrderStatus.bind(null, tenant, order.id, "CANCELLED")}>
               <button type="submit" style={{
-              padding: "4px 10px",
-              background: "#b71c1c",
-              color: "white",
-              borderRadius: "6px",
-              fontSize: "12px",
+              padding: "8px 12px",
+              background: "#fff",
+              color: "#111827",
+              border: "1px solid #d1d5db",
+              borderRadius: "8px",
+              fontSize: "13px",
+              cursor: "pointer",
             }}>Cancel</button>
             </form>
           </>
@@ -142,22 +156,25 @@ function Column({ title, orders, tenant }: any) {
           <>
             <form action={updateKitchenOrderStatus.bind(null, tenant, order.id, "READY")}>
               <button type="submit" style={{
-              padding: "6px 12px",
-              background: "#2e7d32",
+              padding: "8px 12px",
+              background: "#111827",
               color: "white",
               border: "none",
-              borderRadius: "6px",
+              borderRadius: "8px",
               cursor: "pointer",
+              fontSize: "13px",
             }}>Mark Ready</button>
             </form>
 
             <form action={updateKitchenOrderStatus.bind(null, tenant, order.id, "CANCELLED")}>
               <button type="submit" style={{
-              padding: "4px 10px",
-              background: "#b71c1c",
-              color: "white",
-              borderRadius: "6px",
-              fontSize: "12px",
+              padding: "8px 12px",
+              background: "#fff",
+              color: "#111827",
+              border: "1px solid #d1d5db",
+              borderRadius: "8px",
+              fontSize: "13px",
+              cursor: "pointer",
             }}>Cancel</button>
             </form>
           </>
@@ -166,12 +183,13 @@ function Column({ title, orders, tenant }: any) {
         {order.status === "READY" && (
           <form action={updateKitchenOrderStatus.bind(null, tenant, order.id, "COMPLETED")}>
             <button type="submit" style={{
-              padding: "6px 12px",
-              background: "#2e7d32",
+              padding: "8px 12px",
+              background: "#111827",
               color: "white",
               border: "none",
-              borderRadius: "6px",
+              borderRadius: "8px",
               cursor: "pointer",
+              fontSize: "13px",
             }}>Complete</button>
           </form>
         )}

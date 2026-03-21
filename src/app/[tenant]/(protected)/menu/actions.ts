@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/require-auth";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
+import cloudinary from "@/lib/cloudinary";
 
 export async function createCategory(
   tenant: string,
@@ -46,6 +47,25 @@ export async function createMenuItem(
   if (!name || !price) {
     throw new Error("Name and price are required");
   }
+  const imageFile = formData.get("image") as File;
+
+let imageUrl: string | null = null;
+
+if (imageFile && imageFile.size > 0) {
+  const bytes = await imageFile.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  const upload = await new Promise<any>((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream({ folder: "servora/menu-items" }, (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      })
+      .end(buffer);
+  });
+
+  imageUrl = upload.secure_url;
+}
 
   await db.menuItem.create({
     data: {
@@ -56,6 +76,7 @@ export async function createMenuItem(
       restaurantId: session.user.restaurantId,
       categoryId,
       isJainAvailable,
+      imageUrl,
     },
   });
 
@@ -94,7 +115,25 @@ export async function updateMenuItem(
   const price = formData.get("price") as string;
   const description = formData.get("description") as string;
   const isJainAvailable = formData.get("isJainAvailable") === "on";
+  const imageFile = formData.get("image") as File;
 
+let imageUrl: string | null = null;
+
+if (imageFile && imageFile.size > 0) {
+  const bytes = await imageFile.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  const upload = await new Promise<any>((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream({ folder: "servora/menu-items" }, (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      })
+      .end(buffer);
+  });
+
+  imageUrl = upload.secure_url;
+}
   if (!itemId || !name || !price) {
     throw new Error("Missing required fields");
   }
@@ -108,6 +147,7 @@ export async function updateMenuItem(
       price: new Prisma.Decimal(price),
       description: description || null,
       isJainAvailable,
+      ...(imageUrl && { imageUrl }),
     },
   });
 

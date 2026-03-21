@@ -30,7 +30,7 @@ export default async function OrdersPage({ params }: Props) {
 
   return (
     <div>
-      <h1 style={{ marginBottom: "30px" }}>Orders</h1>
+      <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Orders</h1>
       <form
         action={async () => {
           "use server";
@@ -41,12 +41,14 @@ export default async function OrdersPage({ params }: Props) {
         <button
           type="submit"
           style={{
-            padding: "8px 14px",
-            background: "black",
+            padding: "10px 14px",
+            background: "#111827",
             color: "white",
             border: "none",
-            borderRadius: "6px",
+            borderRadius: "8px",
             cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: 500,
           }}
         >
           Create Test Order
@@ -58,23 +60,24 @@ export default async function OrdersPage({ params }: Props) {
         <div
           key={order.id}
           style={{
-            border: "1px solid #ddd",
-            padding: "15px",
-            borderRadius: "8px",
-            marginBottom: "20px",
+            border: "1px solid #e5e7eb",
+            padding: "16px",
+            borderRadius: "10px",
+            marginBottom: "14px",
+            background: "#fff",
           }}
         >
-          <strong>Order #{order.orderCode || order.id.slice(0, 6)}</strong>
+          <strong style={{ color: "#111827" }}>Order #{order.orderCode || order.id.slice(0, 6)}</strong>
 
           {order.tableNumber && (
-            <p>Table: {order.tableNumber}</p>
+            <p style={{ margin: "8px 0 0", color: "#374151" }}>Table: {order.tableNumber}</p>
           )}
 
-          <p>Status: {order.status}</p>
+          <p style={{ margin: "6px 0 0", color: "#4b5563", fontSize: "14px" }}>Status: {order.status}</p>
 
-          <div style={{ marginTop: "10px" }}>
+          <div style={{ marginTop: "10px", display: "grid", gap: "4px" }}>
             {order.items.map((item) => (
-              <div key={item.id}>
+              <div key={item.id} style={{ color: "#374151", fontSize: "14px" }}>
                 {item.quantity}x {item.name}
               </div>
             ))}
@@ -89,17 +92,18 @@ export default async function OrdersPage({ params }: Props) {
           <input type="hidden" name="orderId" value={order.id} />
 
           {order.status === "PENDING" && (
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
             <button
               name="status"
               value="CONFIRMED"
               style={{
-                padding: "6px 12px",
-                background: "#2e7d32",
+                padding: "8px 12px",
+                background: "#111827",
                 color: "white",
                 border: "none",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 cursor: "pointer",
+                fontSize: "13px",
               }}
             >
               Accept
@@ -109,12 +113,13 @@ export default async function OrdersPage({ params }: Props) {
               name="status"
               value="CANCELLED"
               style={{
-                padding: "6px 12px",
-                background: "#c62828",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
+                padding: "8px 12px",
+                background: "#fff",
+                color: "#111827",
+                border: "1px solid #d1d5db",
+                borderRadius: "8px",
                 cursor: "pointer",
+                fontSize: "13px",
               }}
             >
               Decline
@@ -126,12 +131,13 @@ export default async function OrdersPage({ params }: Props) {
 
           {order.status === "READY" && (
             <button name="status" value="COMPLETED" style={{
-              padding: "6px 12px",
-              background: "#2e7d32",
+              padding: "8px 12px",
+              background: "#111827",
               color: "white",
               border: "none",
-              borderRadius: "6px",
+              borderRadius: "8px",
               cursor: "pointer",
+              fontSize: "13px",
             }}>
               Complete Order
             </button>
@@ -140,17 +146,18 @@ export default async function OrdersPage({ params }: Props) {
           <span
             style={{
               padding: "4px 10px",
-              background: "#b71c1c",
-              color: "white",
+              background: "#f3f4f6",
+              color: "#374151",
               borderRadius: "6px",
               fontSize: "12px",
+              border: "1px solid #e5e7eb",
             }}
           >
             Order Cancelled
           </span>
         )}
         </form>
-          <p style={{ marginTop: "10px" }}>
+          <p style={{ marginTop: "10px", fontWeight: 600, color: "#111827" }}>
             Total: ₹{order.total.toString()}
           </p>
         </div>

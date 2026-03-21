@@ -1,6 +1,6 @@
 import { requireAuth } from "@/lib/require-auth";
 import { db } from "@/lib/db";
-import { createCategory, createMenuItem, deleteMenuItem } from "./actions";
+import { createCategory, createMenuItem } from "./actions";
 import MenuItemCard from "./MenuItemCard";
 
 interface Props {
@@ -26,50 +26,82 @@ export default async function MenuPage({ params }: Props) {
 
   return (
     <div>
-      <h1 style={{ marginBottom: "30px" }}>Menu Management</h1>
-      <form 
-      action={async (formData: FormData) => {
-        "use server";
-        await createCategory(tenant, formData);
-      }}
-    style={{ marginBottom: "30px" }}
-    >
-    <input type="text"
-    name="name"
-    placeholder="New Category Name"
-    style={{
-      padding: "8px",
-      marginRight: "10px",
-      borderRadius: "6px",
-      border: "1px solid #ccc",
-    }}
-  />
-  <button
-    type="submit"
-    style={{
-      padding: "8px 14px",
-      borderRadius: "6px",
-      border: "none",
-      background: "black",
-      color: "white",
-      cursor: "pointer",
-    }}
-  >
-    Add Category
-  </button>
-</form>
-    
+      <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Menu Management</h1>
+      <form
+        action={async (formData: FormData) => {
+          "use server";
+          await createCategory(tenant, formData);
+        }}
+        encType="multipart/form-data"
+        style={{
+          marginBottom: "24px",
+          background: "#fff",
+          border: "1px solid #e5e7eb",
+          borderRadius: "10px",
+          padding: "16px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "10px",
+          alignItems: "center",
+        }}
+      >
+        <input
+          type="text"
+          name="name"
+          placeholder="New Category Name"
+          style={{
+            padding: "10px 12px",
+            borderRadius: "8px",
+            border: "1px solid #d1d5db",
+            minWidth: "220px",
+            flex: "1 1 260px",
+            fontSize: "14px",
+          }}
+        />
+        <button
+          type="submit"
+          style={{
+            padding: "10px 14px",
+            borderRadius: "8px",
+            border: "none",
+            background: "#111827",
+            color: "white",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: 500,
+          }}
+        >
+          Add Category
+        </button>
+      </form>
+
       {categories.length === 0 && <p>No categories found.</p>}
 
       {categories.map((category) => (
-        <div key={category.id} style={{ marginBottom: "40px" }}>
-          <h2>{category.name}</h2>
+        <section
+          key={category.id}
+          style={{
+            marginBottom: "24px",
+            border: "1px solid #e5e7eb",
+            borderRadius: "10px",
+            background: "#fff",
+            padding: "16px",
+          }}
+        >
+          <h2 style={{ margin: "0 0 14px", fontSize: "20px", color: "#111827" }}>{category.name}</h2>
           <form
             action={async (formData: FormData) => {
               "use server";
               await createMenuItem(tenant, formData);
             }}
-            style={{ marginTop: "10px", marginBottom: "15px" }}
+            style={{
+              marginTop: "10px",
+              marginBottom: "14px",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "10px",
+              alignItems: "end",
+            }}
           >
             <input type="hidden" name="categoryId" value={category.id} />
 
@@ -78,12 +110,20 @@ export default async function MenuPage({ params }: Props) {
               placeholder="Item name"
               required
               style={{
-                padding: "6px",
-                marginRight: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
+                padding: "10px 12px",
+                borderRadius: "8px",
+                border: "1px solid #d1d5db",
+                width: "100%",
+                boxSizing: "border-box",
               }}
             />
+
+            <div>
+              <label style={{ display: "block", marginBottom: "6px", fontSize: "13px", color: "#4b5563" }}>
+                Menu Image
+              </label>
+              <input type="file" name="image" accept="image/*" />
+            </div>
 
             <input
               name="price"
@@ -92,11 +132,11 @@ export default async function MenuPage({ params }: Props) {
               placeholder="Price"
               required
               style={{
-                padding: "6px",
-                marginRight: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                width: "100px",
+                padding: "10px 12px",
+                borderRadius: "8px",
+                border: "1px solid #d1d5db",
+                width: "100%",
+                boxSizing: "border-box",
               }}
             />
 
@@ -104,56 +144,61 @@ export default async function MenuPage({ params }: Props) {
               name="description"
               placeholder="Description"
               style={{
-                padding: "6px",
-                marginRight: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
+                padding: "10px 12px",
+                borderRadius: "8px",
+                border: "1px solid #d1d5db",
+                width: "100%",
+                boxSizing: "border-box",
               }}
             />
-                 <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    marginRight: "15px",
-                  }}
-                >
-                  <input type="checkbox" name="isJainAvailable" />
-                  Jain
-                </label>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "14px",
+                color: "#374151",
+                minHeight: "42px",
+              }}
+            >
+              <input type="checkbox" name="isJainAvailable" />
+              Jain
+            </label>
             <button
               type="submit"
               style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
+                padding: "10px 12px",
+                borderRadius: "8px",
                 border: "none",
-                background: "#333",
+                background: "#111827",
                 color: "white",
                 cursor: "pointer",
-                marginLeft: "5px",
+                fontSize: "14px",
+                fontWeight: 500,
+                width: "fit-content",
               }}
             >
-              
               Add Item
             </button>
           </form>
           {category.menuItems.length === 0 && (
-            <p style={{ color: "gray" }}>No items in this category.</p>
+            <p style={{ color: "#6b7280", margin: 0 }}>No items in this category.</p>
           )}
 
-            {category.menuItems.map((item) => (
-              <MenuItemCard
-                key={item.id}
-                tenant={tenant}
-                item={{
-                  ...item,
-                  price: item.price.toString(),
-                }}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+          {category.menuItems.map((item) => (
+            <MenuItemCard
+              key={item.id}
+              tenant={tenant}
+              item={{
+                ...item,
+                price: item.price.toString(),
+                imageUrl: item.imageUrl,
+              }}
+            />
+          ))}
+        </section>
+      ))}
+    </div>
 
   );
 }
