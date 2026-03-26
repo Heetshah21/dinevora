@@ -83,9 +83,15 @@ function Column({ title, orders, tenant }: any) {
         >
           <strong style={{ color: "#111827" }}>#{order.orderCode}</strong>
 
-          {order.tableNumber && (
-            <p style={{ margin: "6px 0 0", fontSize: "14px", color: "#4b5563" }}>Table {order.tableNumber}</p>
-          )}
+          {order.tableNumber ? (
+            <p style={{ margin: "6px 0 0", fontSize: "13px", color: "#6b7280" }}>
+              Table {order.tableNumber}
+            </p>
+          ) : order.source === "ONLINE" ? (
+            <p style={{ margin: "6px 0 0", fontSize: "13px", color: "#6b7280" }}>Takeaway</p>
+          ) : order.source === "DELIVERY" ? (
+            <p style={{ margin: "6px 0 0", fontSize: "13px", color: "#6b7280" }}>Delivery</p>
+          ) : null}
 
           <div style={{ marginTop: "8px", display: "grid", gap: "4px" }}>
           {order.items.map((item: any) => (

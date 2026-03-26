@@ -5,7 +5,16 @@ import { Prisma } from "@prisma/client";
 export async function POST(req: Request) {
   const body = await req.json();
 
-  const { restaurantSlug, items, orderNotes, tableNumber } = body;
+  const {
+    restaurantSlug,
+    items,
+    orderNotes,
+    tableNumber,
+    orderType,
+    customerName,
+    customerPhone,
+    deliveryAddress,
+  } = body;
 
   const restaurant = await db.restaurant.findFirst({
     where: {
@@ -86,6 +95,10 @@ export async function POST(req: Request) {
       notes: orderNotes || null,
       orderCode: orderCode,
       tableNumber: tableNumber || null,
+      customerName: customerName || null,
+      customerPhone: customerPhone || null,
+      deliveryAddress: deliveryAddress || null,
+      source: orderType,
       items: {
         create: items.map((item: any) => ({
           tenantId: restaurant.tenantId,

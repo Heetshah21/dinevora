@@ -107,6 +107,9 @@ model Restaurant {
   upiId          String?
   @@unique([tenantId, slug])
   @@index([tenantId])
+  acceptsDineIn   Boolean @default(true)
+  acceptsTakeaway Boolean @default(true)
+  acceptsDelivery Boolean @default(false)
 
 }
 
@@ -201,7 +204,10 @@ model Order {
   tenant             Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   items              OrderItem[]
   payments           Payment[]
-
+  customerName       String?
+  customerPhone      String?
+  deliveryAddress    String?
+  orderType          OrderSource?
   @@index([tenantId, restaurantId, placedAt])
   @@index([tenantId, status, placedAt])
   @@index([tenantId, customerId, placedAt])

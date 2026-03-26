@@ -58,9 +58,34 @@ export default async function OrderHistoryPage({ params }: Props) {
           >
             <strong>#{order.orderCode}</strong>
 
-            {order.tableNumber && (
-              <p>Table {order.tableNumber}</p>
-            )}
+            <div style={{ marginTop: "6px" }}>
+              {order.tableNumber ? (
+                <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
+                  Table {order.tableNumber}
+                </p>
+              ) : order.source === "ONLINE" ? (
+                <>
+                  <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
+                    Takeaway – {order.customerName || ""}
+                  </p>
+                  <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#6b7280" }}>
+                    Phone: {order.customerPhone || ""}
+                  </p>
+                </>
+              ) : order.source === "DELIVERY" ? (
+                <>
+                  <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
+                    Delivery – {order.customerName || ""}
+                  </p>
+                  <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#6b7280" }}>
+                    Phone: {order.customerPhone || ""}
+                  </p>
+                  <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#6b7280" }}>
+                    Address: {order.deliveryAddress || ""}
+                  </p>
+                </>
+              ) : null}
+            </div>
 
             <p>Status: {order.status}</p>
 

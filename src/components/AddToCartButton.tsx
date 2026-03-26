@@ -32,14 +32,18 @@ export default function AddToCartButton({ item }: any) {
         type="button"
         onClick={handleAddClick}
         style={{
-          height: "35px",
+          height: "40px",
           alignSelf: "center",
-          background: "#111",
+          background: "#111827",
           color: "white",
           border: "none",
-          borderRadius: "6px",
-          padding: "0 10px",
+          borderRadius: "12px",
+          padding: "0 16px",
           cursor: "pointer",
+          fontSize: "14px",
+          fontWeight: 600,
+          whiteSpace: "nowrap",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
         }}
       >
         Add

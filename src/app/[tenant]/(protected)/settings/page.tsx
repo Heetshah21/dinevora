@@ -117,6 +117,69 @@ export default async function SettingsPage({ params }: Props) {
           <input type="file" name="logo" accept="image/*" />
         </div>
 
+        <div>
+        <label style={{ display: "block", marginBottom: "6px", fontSize: "13px", color: "#4b5563" }}>
+          Phone Number
+        </label>
+        <input
+          name="phone"
+          defaultValue={restaurant?.phone || ""}
+          style={{
+            width: "100%",
+            maxWidth: "300px",
+            padding: "10px 12px",
+            borderRadius: "8px",
+            border: "1px solid #d1d5db",
+          }}
+        />
+      </div>
+
+      <div>
+        <label style={{ display: "block", marginBottom: "6px", fontSize: "13px", color: "#4b5563" }}>
+          UPI ID
+        </label>
+        <input
+          name="upiId"
+          defaultValue={restaurant?.upiId || ""}
+          style={{
+            width: "100%",
+            maxWidth: "300px",
+            padding: "10px 12px",
+            borderRadius: "8px",
+            border: "1px solid #d1d5db",
+          }}
+        />
+      </div>
+
+      <div style={{ display: "flex", gap: "20px", marginTop: "10px" }}>
+        <label>
+          <input
+            type="checkbox"
+            name="acceptsDineIn"
+            defaultChecked={restaurant?.acceptsDineIn}
+          />{" "}
+          Accept Dine In
+        </label>
+
+        <label>
+          <input
+            type="checkbox"
+            name="acceptsTakeaway"
+            defaultChecked={restaurant?.acceptsTakeaway}
+          />{" "}
+          Accept Takeaway
+        </label>
+
+        <label>
+          <input
+            type="checkbox"
+            name="acceptsDelivery"
+            defaultChecked={restaurant?.acceptsDelivery}
+          />{" "}
+          Accept Delivery
+        </label>
+      </div>
+
         <button
           type="submit"
           style={{

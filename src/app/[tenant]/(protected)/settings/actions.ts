@@ -17,7 +17,12 @@ export async function updateRestaurantSettings(
   const currency = formData.get("currency") as string;
   const taxPercent = formData.get("taxPercent") as string;
   const servicePercent = formData.get("servicePercent") as string;
+  const phone = formData.get("phone") as string;
+  const upiId = formData.get("upiId") as string;
 
+  const acceptsDineIn = formData.get("acceptsDineIn") === "on";
+  const acceptsTakeaway = formData.get("acceptsTakeaway") === "on";
+  const acceptsDelivery = formData.get("acceptsDelivery") === "on";
   const logoFile = formData.get("logo") as File;
 
   let logoUrl: string | null = null;
@@ -43,6 +48,11 @@ export async function updateRestaurantSettings(
     data: {
       name,
       currency,
+      phone,
+      upiId,
+      acceptsDineIn,
+      acceptsTakeaway,
+      acceptsDelivery,
       taxPercent: new Prisma.Decimal(taxPercent),
       servicePercent: new Prisma.Decimal(servicePercent),
       ...(logoUrl && { logoUrl }),
