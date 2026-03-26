@@ -7,7 +7,7 @@ import {
   removeFromCart,
 } from "@/lib/cart";
 
-export default function CartClient({ tenant }: { tenant: string }) {
+export default function CartClient({ restaurant }: { restaurant: string }) {
   const [cart, setCart] = useState<any[]>([]);
   const [orderNotes, setOrderNotes] = useState("");
 
@@ -37,6 +37,11 @@ export default function CartClient({ tenant }: { tenant: string }) {
     );
   };
 
+  const tableNumber =
+    typeof window !== "undefined"
+      ? localStorage.getItem("servora_table")
+      : null;
+
   const placeOrder = async () => {
     const res = await fetch("/api/orders/place", {
       method: "POST",
@@ -44,9 +49,10 @@ export default function CartClient({ tenant }: { tenant: string }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        tenantSlug: tenant,
+        restaurantSlug: restaurant,
         items: cart,
         orderNotes: orderNotes,
+        tableNumber: tableNumber,
       }),
     });
 
@@ -55,7 +61,8 @@ export default function CartClient({ tenant }: { tenant: string }) {
 
     if (data.orderId) {
       localStorage.removeItem("servora_cart");
-      window.location.href = `/t/${tenant}/order/${data.orderId}`;
+      localStorage.removeItem("servora_table");
+      window.location.href = `/r/${restaurant}/order/${data.orderId}`;
     } else {
       alert("Order creation failed");
     }
@@ -64,7 +71,7 @@ export default function CartClient({ tenant }: { tenant: string }) {
   return (
     <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
       <a
-        href={`/t/${tenant}/menu`}
+        href={`/r/${restaurant}/menu`}
         style={{
           display: "inline-block",
           marginBottom: "20px",

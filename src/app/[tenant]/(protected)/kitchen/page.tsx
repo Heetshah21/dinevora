@@ -81,7 +81,7 @@ function Column({ title, orders, tenant }: any) {
             background: "white",
           }}
         >
-          <strong style={{ color: "#111827" }}>#{order.id.slice(0, 6)}</strong>
+          <strong style={{ color: "#111827" }}>#{order.orderCode}</strong>
 
           {order.tableNumber && (
             <p style={{ margin: "6px 0 0", fontSize: "14px", color: "#4b5563" }}>Table {order.tableNumber}</p>

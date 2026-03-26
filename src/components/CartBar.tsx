@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getCartCount, getCartTotal } from "@/lib/cart";
 import Link from "next/link";
 
-export default function CartBar({ tenant }: { tenant: string }) {
+export default function CartBar({ restaurant  }: { restaurant : string }) {
   const [count, setCount] = useState(0);
   const [total, setTotal] = useState(0);
 
@@ -43,7 +43,7 @@ export default function CartBar({ tenant }: { tenant: string }) {
       <span>{count} items • ₹{total} </span>
 
       <Link
-        href={`/t/${tenant}/cart`}
+        href={`/r/${restaurant}/cart`}
         style={{
           background: "white",
           color: "black",

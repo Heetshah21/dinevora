@@ -2,13 +2,13 @@ import OrderStatusClient from "./OrderStatusClient";
 
 interface Props {
   params: Promise<{
-    tenant: string;
+    restaurant: string;
     orderId: string;
   }>;
 }
 
 export default async function Page({ params }: Props) {
-  const { orderId } = await params;
+  const {restaurant, orderId } = await params;
 
-  return <OrderStatusClient orderId={orderId} />;
+  return <OrderStatusClient restaurant={restaurant} orderId={orderId} />;
 }

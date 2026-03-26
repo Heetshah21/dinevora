@@ -5,20 +5,18 @@ import { Prisma } from "@prisma/client";
 export async function POST(req: Request) {
   const body = await req.json();
 
-  const { tenantSlug, items, orderNotes } = body;
+  const { restaurantSlug, items, orderNotes, tableNumber } = body;
 
-  const tenant = await db.tenant.findFirst({
-    where: { slug: tenantSlug },
-    include: {
-      restaurants: true,
+  const restaurant = await db.restaurant.findFirst({
+    where: {
+      slug: restaurantSlug,
+      isActive: true,
     },
   });
 
-  if (!tenant || tenant.restaurants.length === 0) {
+  if (!restaurant) {
     return NextResponse.json({ error: "Restaurant not found" });
   }
-
-  const restaurant = tenant.restaurants[0];
 
   let subtotal = 0;
 
@@ -29,6 +27,51 @@ export async function POST(req: Request) {
   const tax = 0;
   const discount = 0;
   const total = subtotal + tax - discount;
+
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const orderCode = await db.$transaction(async (tx) => {
+    let counter = await tx.orderCounter.findUnique({
+      where: {
+        tenantId_restaurantId_date: {
+          tenantId: restaurant.tenantId,
+          restaurantId: restaurant.id,
+          date: todayStart,
+        },
+      },
+    });
+
+    if (!counter) {
+      counter = await tx.orderCounter.create({
+        data: {
+          tenantId: restaurant.tenantId,
+          restaurantId: restaurant.id,
+          date: todayStart,
+          lastNumber: 1,
+        },
+      });
+
+      return String(counter.lastNumber);
+    }
+
+    counter = await tx.orderCounter.update({
+      where: {
+        tenantId_restaurantId_date: {
+          tenantId: restaurant.tenantId,
+          restaurantId: restaurant.id,
+          date: todayStart,
+        },
+      },
+      data: {
+        lastNumber: {
+          increment: 1,
+        },
+      },
+    });
+
+    return String(counter.lastNumber);
+  });
 
   const order = await db.order.create({
     data: {
@@ -41,7 +84,8 @@ export async function POST(req: Request) {
       total: new Prisma.Decimal(total),
       currency: "INR",
       notes: orderNotes || null,
-
+      orderCode: orderCode,
+      tableNumber: tableNumber || null,
       items: {
         create: items.map((item: any) => ({
           tenantId: restaurant.tenantId,

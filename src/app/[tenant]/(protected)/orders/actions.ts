@@ -71,3 +71,24 @@ export async function updateOrderStatus(
   
     revalidatePath(`/${tenant}/orders`);
   }
+  export async function markOrderPaid(tenant: string, formData: FormData) {
+    const session = await requireAuth(tenant);
+  
+    const orderId = formData.get("orderId") as string;
+    const amount = formData.get("amount") as string;
+  
+    await db.payment.create({
+      data: {
+        tenantId: session.user.tenantId,
+        orderId: orderId,
+        status: "CAPTURED",
+        method: "CASH",
+        amount: amount,
+        currency: "INR",
+        paidAt: new Date(),
+      },
+    });
+  
+    revalidatePath(`/${tenant}/orders`);
+    revalidatePath(`/${tenant}/orders/history`);
+  }

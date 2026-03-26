@@ -76,6 +76,7 @@ model Tenant {
   payments       Payment[]
   restaurants    Restaurant[]
   users          User[]
+  orderCounters OrderCounter[]
 }
 
 model Restaurant {
@@ -91,10 +92,12 @@ model Restaurant {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   deletedAt      DateTime?
+  shortCode      String?  @unique
   menuCategories MenuCategory[]
   menuItems      MenuItem[]
   orders         Order[]
   users          User[] 
+  orderCounters OrderCounter[]
   tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   logoUrl        String?
   currency       String   @default("INR")
@@ -104,6 +107,7 @@ model Restaurant {
   upiId          String?
   @@unique([tenantId, slug])
   @@index([tenantId])
+
 }
 
 model MenuCategory {
@@ -248,7 +252,19 @@ model Payment {
   @@index([tenantId, status])
   @@index([tenantId, createdAt])
 }
+model OrderCounter {
+  id           String   @id @default(cuid())
+  tenantId     String
+  restaurantId String
+  date         DateTime
+  lastNumber   Int      @default(0)
 
+  tenant       Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, restaurantId, date])
+  @@index([tenantId, restaurantId, date])
+}
 enum Role {
   OWNER
   MANAGER

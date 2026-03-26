@@ -2,6 +2,7 @@ import { requireAuth } from "@/lib/require-auth";
 import { db } from "@/lib/db";
 import { createTestOrder } from "./actions";
 import { updateOrderStatus } from "./actions";
+import { markOrderPaid } from "./actions";
 
 interface Props {
   params: Promise<{ tenant: string }>;
@@ -16,12 +17,18 @@ export default async function OrdersPage({ params }: Props) {
     where: {
       tenantId: session.user.tenantId,
       restaurantId: session.user.restaurantId,
+      payments: {
+        none: {
+          status: "CAPTURED",
+        },
+      },
       status: {
-        notIn: ["COMPLETED", "CANCELLED"],
+        not: "CANCELLED",
       },
     },
     include: {
       items: true,
+      payments: true,
     },
     orderBy: {
       placedAt: "desc",
@@ -67,7 +74,7 @@ export default async function OrdersPage({ params }: Props) {
             background: "#fff",
           }}
         >
-          <strong style={{ color: "#111827" }}>Order #{order.orderCode || order.id.slice(0, 6)}</strong>
+          <strong style={{ color: "#111827" }}>Order #{order.orderCode}</strong>
 
           {order.tableNumber && (
             <p style={{ margin: "8px 0 0", color: "#374151" }}>Table: {order.tableNumber}</p>
@@ -170,6 +177,35 @@ export default async function OrdersPage({ params }: Props) {
               Complete Order
             </button>
           )}
+          </form>
+          {order.status === "COMPLETED" && (
+            <form
+              action={async (formData: FormData) => {
+                "use server";
+                await markOrderPaid(tenant, formData);
+              }}
+              style={{ marginTop: "6px" }}
+            >
+              <input type="hidden" name="orderId" value={order.id} />
+              <input type="hidden" name="amount" value={order.total.toString()} />
+
+              <button
+                style={{
+                  padding: "8px 12px",
+                  background: "#16a34a",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontSize: "13px",
+                }}
+              >
+                Mark Paid
+              </button>
+            </form>
+          )}
+
+          <form>
           {order.status === "CANCELLED" && (
           <span
             style={{

@@ -41,20 +41,23 @@ export default async function DashboardPage({ params }: Props) {
       restaurantId: session.user.restaurantId,
     },
   });
-  const revenueToday = await db.order.aggregate({
+  const revenueToday = await db.payment.aggregate({
     where: {
       tenantId: session.user.tenantId,
-      restaurantId: session.user.restaurantId,
-      status: "COMPLETED",
-      placedAt: {
+      order: {
+        restaurantId: session.user.restaurantId,
+      },
+      status: "CAPTURED",
+      paidAt: {
         gte: startOfDay,
       },
     },
     _sum: {
-      total: true,
+      amount: true,
     },
   });
-  const revenue = revenueToday._sum.total?.toString() ?? "0";
+  
+  const revenue = revenueToday._sum.amount?.toString() ?? "0";
 
   return (
     <div>

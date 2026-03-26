@@ -16,9 +16,18 @@ export default async function OrderHistoryPage({ params }: Props) {
     where: {
       tenantId: session.user.tenantId,
       restaurantId: session.user.restaurantId,
-      status: {
-        in: ["COMPLETED", "CANCELLED"],
-      },
+      OR: [
+        {
+          payments: {
+            some: {
+              status: "CAPTURED",
+            },
+          },
+        },
+        {
+          status: "CANCELLED",
+        },
+      ],
     },
     include: {
       items: true,
@@ -47,7 +56,7 @@ export default async function OrderHistoryPage({ params }: Props) {
               background: "white",
             }}
           >
-            <strong>#{order.id.slice(0, 6)}</strong>
+            <strong>#{order.orderCode}</strong>
 
             {order.tableNumber && (
               <p>Table {order.tableNumber}</p>
