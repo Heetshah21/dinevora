@@ -81,7 +81,7 @@ export default async function OrdersPage({ params }: Props) {
               <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
                 Table {order.tableNumber}
               </p>
-            ) : order.source === "ONLINE" ? (
+            ) : order.source === "TAKEAWAY" ? (
               <>
                 <p style={{ margin: 0, fontSize: "13px", color: "#6b7280" }}>
                   Takeaway – {order.customerName || ""}

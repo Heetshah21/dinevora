@@ -65,7 +65,7 @@ export default async function CustomerMenuPage({
               style={{
                 position: "sticky",
                 top: 0,
-                zIndex: 1,
+                zIndex: 10,
                 background: "rgba(245, 246, 248, 0.85)",
                 backdropFilter: "blur(10px)",
                 padding: "10px 0",

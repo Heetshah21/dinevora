@@ -55,6 +55,7 @@ export default async function TenantLayout({
           <SidebarNavLink href={`/${tenant}/orders`} label="Orders" />
           <SidebarNavLink href={`/${tenant}/orders/history`} label="Orders History" />
           <SidebarNavLink href={`/${tenant}/kitchen`} label="Kitchen" />
+          <SidebarNavLink href={`/${tenant}/qr`} label="QR Codes" />
           <SidebarNavLink href={`/${tenant}/settings`} label="Settings" />
         </nav>
 

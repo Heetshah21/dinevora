@@ -14,7 +14,12 @@ export default async function DashboardPage({ params }: Props) {
 
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
-
+  
+  const restaurant = await db.restaurant.findFirst({
+    where: {
+      id: session.user.restaurantId,
+    },
+  });
   const ordersToday = await db.order.count({
     where: {
       tenantId: session.user.tenantId,
@@ -59,6 +64,54 @@ export default async function DashboardPage({ params }: Props) {
   
   const revenue = revenueToday._sum.amount?.toString() ?? "0";
 
+  const completedOrdersToday = await db.order.count({
+    where: {
+      tenantId: session.user.tenantId,
+      restaurantId: session.user.restaurantId,
+      status: "COMPLETED",
+      placedAt: {
+        gte: startOfDay,
+      },
+    },
+  });
+  
+  const avgOrderValue =
+    completedOrdersToday > 0
+      ? (Number(revenue) / completedOrdersToday).toFixed(0)
+      : "0";
+  
+  const dineInOrders = await db.order.count({
+    where: {
+      tenantId: session.user.tenantId,
+      restaurantId: session.user.restaurantId,
+      source: "IN_STORE",
+      placedAt: {
+        gte: startOfDay,
+      },
+    },
+  });
+  
+  const takeawayOrders = await db.order.count({
+    where: {
+      tenantId: session.user.tenantId,
+      restaurantId: session.user.restaurantId,
+      source: "TAKEAWAY",
+      placedAt: {
+        gte: startOfDay,
+      },
+    },
+  });
+  
+  const deliveryOrders = await db.order.count({
+    where: {
+      tenantId: session.user.tenantId,
+      restaurantId: session.user.restaurantId,
+      source: "DELIVERY",
+      placedAt: {
+        gte: startOfDay,
+      },
+    },
+  });
   return (
     <div>
       <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Dashboard</h1>
@@ -75,6 +128,19 @@ export default async function DashboardPage({ params }: Props) {
         <Card title="Active Orders" value={activeOrders} />
         <Card title="Menu Items" value={menuItems} />
         <Card title="Revenue Today" value={revenue} />
+        <Card title="Completed Orders" value={completedOrdersToday} />
+        <Card title="Avg Order Value" value={`₹${avgOrderValue}`} />
+        {restaurant?.acceptsDineIn && (
+        <Card title="Dine-In Orders" value={dineInOrders} />
+        )}
+
+        {restaurant?.acceptsTakeaway && (
+        <Card title="Takeaway Orders" value={takeawayOrders} />
+        )}
+
+        {restaurant?.acceptsDelivery && (
+        <Card title="Delivery Orders" value={deliveryOrders} />
+        )}
       </div>
     </div>
   );

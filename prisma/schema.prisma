@@ -182,7 +182,7 @@ model Order {
   restaurantId       String
   customerId         String?
   status             OrderStatus @default(PENDING)
-  source             OrderSource @default(ONLINE)
+  source             OrderSource @default(TAKEAWAY)
   subtotal           Decimal
   tax                Decimal
   discount           Decimal     @default(0)
@@ -297,6 +297,7 @@ enum OrderSource {
   ONLINE
   DELIVERY
   KIOSK
+  TAKEAWAY
 }
 
 enum PaymentStatus {

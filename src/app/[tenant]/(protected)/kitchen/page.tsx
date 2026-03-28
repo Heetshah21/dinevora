@@ -87,7 +87,7 @@ function Column({ title, orders, tenant }: any) {
             <p style={{ margin: "6px 0 0", fontSize: "13px", color: "#6b7280" }}>
               Table {order.tableNumber}
             </p>
-          ) : order.source === "ONLINE" ? (
+          ) : order.source === "TAKEAWAY" ? (
             <p style={{ margin: "6px 0 0", fontSize: "13px", color: "#6b7280" }}>Takeaway</p>
           ) : order.source === "DELIVERY" ? (
             <p style={{ margin: "6px 0 0", fontSize: "13px", color: "#6b7280" }}>Delivery</p>

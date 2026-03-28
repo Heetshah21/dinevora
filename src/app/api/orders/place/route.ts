@@ -26,7 +26,16 @@ export async function POST(req: Request) {
   if (!restaurant) {
     return NextResponse.json({ error: "Restaurant not found" });
   }
+  let source = "TAKEAWAY";
 
+  if (tableNumber) {
+    source = "IN_STORE";
+  } else if (orderType === "DELIVERY") {
+    source = "DELIVERY";
+  } else {
+    source = "TAKEAWAY";
+  }
+  
   let subtotal = 0;
 
   for (const item of items) {
@@ -98,7 +107,7 @@ export async function POST(req: Request) {
       customerName: customerName || null,
       customerPhone: customerPhone || null,
       deliveryAddress: deliveryAddress || null,
-      source: orderType,
+      source: source,
       items: {
         create: items.map((item: any) => ({
           tenantId: restaurant.tenantId,
