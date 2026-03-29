@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
-
+import { OrderSource } from "@prisma/client";
 export async function POST(req: Request) {
   const body = await req.json();
 
@@ -107,7 +107,7 @@ export async function POST(req: Request) {
       customerName: customerName || null,
       customerPhone: customerPhone || null,
       deliveryAddress: deliveryAddress || null,
-      source: source,
+      source: source as OrderSource,
       items: {
         create: items.map((item: any) => ({
           tenantId: restaurant.tenantId,

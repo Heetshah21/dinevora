@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import bcrypt from "bcrypt";
 
@@ -22,7 +21,6 @@ declare module "next-auth" {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(db),
 
   providers: [
     Credentials({
@@ -36,7 +34,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials?.email || !credentials?.password || !credentials?.tenantSlug) {
           return null;
         }
-        const tenantSlug = credentials?.tenantSlug;
+        
+        const tenantSlug = credentials?.tenantSlug as string;
         if (!tenantSlug) return null;
 
         const tenant = await db.tenant.findUnique({
@@ -48,7 +47,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = await db.user.findUnique({
           where: {
             email_tenantId: {
-              email: credentials.email,
+              email: credentials.email as string,
               tenantId: tenant.id,
             },
           },
@@ -66,7 +65,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!user) return null;
 
         const valid = await bcrypt.compare(
-          credentials.password,
+          credentials.password as string,
           user.password
         );
 
