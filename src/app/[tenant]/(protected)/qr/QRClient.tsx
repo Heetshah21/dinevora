@@ -3,16 +3,17 @@
 import { useState } from "react";
 import QRCode from "qrcode";
 
-export default function QRClient({ tenant }: { tenant: string }) {
+export default function QRClient({ shortCode }: { shortCode: string }) {
   const [count, setCount] = useState("");
   const [qrs, setQrs] = useState<any[]>([]);
 
   const generateQR = async () => {
     const total = Number(count);
     const arr = [];
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
 
     for (let i = 1; i <= total; i++) {
-      const url = `http://servora-sable.vercel.app/r/${tenant}/menu?table=${i}`;
+      const url = `${baseUrl}/m/${shortCode}?table=${i}`;
       const qr = await QRCode.toDataURL(url);
 
       arr.push({
@@ -33,49 +34,16 @@ export default function QRClient({ tenant }: { tenant: string }) {
         placeholder="Number of Tables"
         value={count}
         onChange={(e) => setCount(e.target.value)}
-        style={{
-          padding: "10px",
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          marginRight: "10px",
-        }}
       />
 
-      <button
-        onClick={generateQR}
-        style={{
-          padding: "10px 14px",
-          background: "#111",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-        }}
-      >
-        Generate QR Codes
-      </button>
+      <button onClick={generateQR}>Generate QR Codes</button>
 
-      <div
-        style={{
-          marginTop: "30px",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "20px",
-        }}
-      >
+      <div style={{ marginTop: "30px" }}>
         {qrs.map((q) => (
-          <div
-            key={q.table}
-            style={{
-              border: "1px solid #eee",
-              padding: "10px",
-              borderRadius: "10px",
-              textAlign: "center",
-              background: "white",
-            }}
-          >
+          <div key={q.table}>
             <h3>Table {q.table}</h3>
             <img src={q.qr} style={{ width: "150px" }} />
-            <p style={{ fontSize: "12px" }}>{q.url}</p>
+            <p>{q.url}</p>
           </div>
         ))}
       </div>
