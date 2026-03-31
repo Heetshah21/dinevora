@@ -21,6 +21,9 @@ export default async function QRPage({ params }: Props) {
   if (!restaurant) {
     return <div>Restaurant not found</div>;
   }
+  if (!restaurant.shortCode) {
+    return <div>Restaurant short code not set</div>;
+  }
 
   return <QRClient shortCode={restaurant.shortCode} />;
 }
