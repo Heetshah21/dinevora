@@ -1,4 +1,3 @@
-export const dynamic = "force-static";
 export const revalidate = 60;
 import { requireAuth } from "@/lib/require-auth";
 import { db } from "@/lib/db";

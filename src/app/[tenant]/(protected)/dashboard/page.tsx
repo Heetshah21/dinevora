@@ -1,4 +1,5 @@
 export const revalidate = 10;
+
 import { requireAuth } from "@/lib/require-auth";
 import { db } from "@/lib/db";
 
@@ -13,31 +14,32 @@ export default async function DashboardPage({ params }: Props) {
 
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
-  
+
   const restaurant = await db.restaurant.findFirst({
     where: {
       id: session.user.restaurantId,
     },
   });
-  
+
   const [
-    ordersToday,
+    orders,
     activeOrders,
     menuItems,
-    revenueToday,
-    completedOrdersToday,
-    dineInOrders,
-    takeawayOrders,
-    deliveryOrders
+    revenueToday
   ] = await Promise.all([
-    db.order.count({
+    db.order.findMany({
       where: {
         tenantId: session.user.tenantId,
         restaurantId: session.user.restaurantId,
         placedAt: { gte: startOfDay },
       },
+      select: {
+        status: true,
+        source: true,
+        total: true,
+      },
     }),
-  
+
     db.order.count({
       where: {
         tenantId: session.user.tenantId,
@@ -47,14 +49,14 @@ export default async function DashboardPage({ params }: Props) {
         },
       },
     }),
-  
+
     db.menuItem.count({
       where: {
         tenantId: session.user.tenantId,
         restaurantId: session.user.restaurantId,
       },
     }),
-  
+
     db.payment.aggregate({
       where: {
         tenantId: session.user.tenantId,
@@ -66,54 +68,39 @@ export default async function DashboardPage({ params }: Props) {
       },
       _sum: { amount: true },
     }),
-    
-  
-    db.order.count({
-      where: {
-        tenantId: session.user.tenantId,
-        restaurantId: session.user.restaurantId,
-        status: "COMPLETED",
-        placedAt: { gte: startOfDay },
-      },
-    }),
-  
-    db.order.count({
-      where: {
-        tenantId: session.user.tenantId,
-        restaurantId: session.user.restaurantId,
-        source: "IN_STORE",
-        placedAt: { gte: startOfDay },
-      },
-    }),
-  
-    db.order.count({
-      where: {
-        tenantId: session.user.tenantId,
-        restaurantId: session.user.restaurantId,
-        source: "TAKEAWAY",
-        placedAt: { gte: startOfDay },
-      },
-    }),
-  
-    db.order.count({
-      where: {
-        tenantId: session.user.tenantId,
-        restaurantId: session.user.restaurantId,
-        source: "DELIVERY",
-        placedAt: { gte: startOfDay },
-      },
-    }),
   ]);
-  
+
+  // Calculate analytics from orders array
+  const ordersToday = orders.length;
+
+  const completedOrdersToday = orders.filter(
+    (o) => o.status === "COMPLETED"
+  ).length;
+
+  const dineInOrders = orders.filter(
+    (o) => o.source === "IN_STORE"
+  ).length;
+
+  const takeawayOrders = orders.filter(
+    (o) => o.source === "TAKEAWAY"
+  ).length;
+
+  const deliveryOrders = orders.filter(
+    (o) => o.source === "DELIVERY"
+  ).length;
+
   const revenue = revenueToday._sum.amount?.toString() ?? "0";
 
-const avgOrderValue =
-  completedOrdersToday > 0
-    ? (Number(revenue) / completedOrdersToday).toFixed(0)
-    : "0";
+  const avgOrderValue =
+    completedOrdersToday > 0
+      ? (Number(revenue) / completedOrdersToday).toFixed(0)
+      : "0";
+
   return (
     <div>
-      <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Dashboard</h1>
+      <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>
+        Dashboard
+      </h1>
 
       <div
         style={{
@@ -128,17 +115,18 @@ const avgOrderValue =
         <Card title="Menu Items" value={menuItems} />
         <Card title="Revenue Today" value={revenue} />
         <Card title="Completed Orders" value={completedOrdersToday} />
-          <Card title="Avg Order Value" value={`₹${avgOrderValue}`} />
+        <Card title="Avg Order Value" value={`₹${avgOrderValue}`} />
+
         {restaurant?.acceptsDineIn && (
-        <Card title="Dine-In Orders" value={dineInOrders} />
+          <Card title="Dine-In Orders" value={dineInOrders} />
         )}
 
         {restaurant?.acceptsTakeaway && (
-        <Card title="Takeaway Orders" value={takeawayOrders} />
+          <Card title="Takeaway Orders" value={takeawayOrders} />
         )}
 
         {restaurant?.acceptsDelivery && (
-        <Card title="Delivery Orders" value={deliveryOrders} />
+          <Card title="Delivery Orders" value={deliveryOrders} />
         )}
       </div>
     </div>
