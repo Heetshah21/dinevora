@@ -67,6 +67,7 @@ export default async function DashboardPage({ params }: Props) {
       },
       _sum: { amount: true },
     }),
+    
   
     db.order.count({
       where: {
@@ -106,6 +107,11 @@ export default async function DashboardPage({ params }: Props) {
   ]);
   
   const revenue = revenueToday._sum.amount?.toString() ?? "0";
+
+const avgOrderValue =
+  completedOrdersToday > 0
+    ? (Number(revenue) / completedOrdersToday).toFixed(0)
+    : "0";
   return (
     <div>
       <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Dashboard</h1>
@@ -123,7 +129,7 @@ export default async function DashboardPage({ params }: Props) {
         <Card title="Menu Items" value={menuItems} />
         <Card title="Revenue Today" value={revenue} />
         <Card title="Completed Orders" value={completedOrdersToday} />
-        <Card title="Avg Order Value" value={`₹${avgOrderValue}`} />
+          <Card title="Avg Order Value" value={`₹${avgOrderValue}`} />
         {restaurant?.acceptsDineIn && (
         <Card title="Dine-In Orders" value={dineInOrders} />
         )}
