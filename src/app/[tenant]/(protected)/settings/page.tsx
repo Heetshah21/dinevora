@@ -181,7 +181,7 @@ export default async function SettingsPage({ params }: Props) {
           Accept Delivery
         </label>
       </div>
-      <ChangePasswordForm tenant={tenant} />
+      
 
         <button
           type="submit"
@@ -201,6 +201,7 @@ export default async function SettingsPage({ params }: Props) {
           Save Settings
         </button>
       </form>
+      <ChangePasswordForm tenant={tenant} />
     </div>
   );
 }
