@@ -23,8 +23,41 @@ export default async function TenantLayout({
   });
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f3f4f6" }}>
+    <div
+      className="servoraTenantLayoutRoot"
+      style={{ display: "flex", minHeight: "100vh", background: "#f3f4f6" }}
+    >
+      {/* CSS-only sidebar toggle (no backend/routing/auth changes). */}
+      <input
+        id="servoraSidebarToggle"
+        type="checkbox"
+        className="servoraSidebarToggleInput"
+        aria-hidden="true"
+      />
+
+      {/* Mobile-only backdrop to close the sidebar. */}
+      <label
+        htmlFor="servoraSidebarToggle"
+        className="servoraMobileBackdrop"
+        aria-hidden="true"
+      />
+
+      {/* Mobile-only top bar with restaurant name. */}
+      <div className="servoraMobileTopbar">
+        <label
+          htmlFor="servoraSidebarToggle"
+          className="servoraMobileMenuButton"
+          aria-label="Open navigation"
+        >
+          Menu
+        </label>
+        <div className="servoraMobileRestaurantName">
+          {restaurant?.name || "Servora"}
+        </div>
+      </div>
+
       <aside
+        className="servoraSidebar"
         style={{
           width: "250px",
           background: "#ffffff",
@@ -53,7 +86,10 @@ export default async function TenantLayout({
           <SidebarNavLink href={`/${tenant}/dashboard`} label="Dashboard" />
           <SidebarNavLink href={`/${tenant}/menu`} label="Menu" />
           <SidebarNavLink href={`/${tenant}/orders`} label="Orders" />
-          <SidebarNavLink href={`/${tenant}/orders/history`} label="Orders History" />
+          <SidebarNavLink
+            href={`/${tenant}/orders/history`}
+            label="Orders History"
+          />
           <SidebarNavLink href={`/${tenant}/kitchen`} label="Kitchen" />
           <SidebarNavLink href={`/${tenant}/qr`} label="QR Codes" />
           <SidebarNavLink href={`/${tenant}/settings`} label="Settings" />
@@ -86,18 +122,139 @@ export default async function TenantLayout({
       </aside>
 
       <main
+        className="servoraMain"
         style={{
           marginLeft: "250px",
           width: "calc(100% - 250px)",
           padding: "28px",
           maxWidth: "1600px",
-        minHeight: "100vh",
+          minHeight: "100vh",
           background: "#f3f4f6",
           boxSizing: "border-box",
         }}
       >
         {children}
       </main>
+
+      <style jsx global>{`
+        /* Mobile responsiveness only: keep desktop layout exactly as-is. */
+        .servoraSidebarToggleInput {
+          display: none;
+        }
+
+        .servoraMobileTopbar {
+          display: none;
+        }
+
+        .servoraMobileBackdrop {
+          display: none;
+        }
+
+        @media (max-width: 768px) {
+          .servoraTenantLayoutRoot {
+            overflow-x: hidden;
+          }
+
+          /* If any tables exist inside protected pages, allow horizontal scrolling on mobile. */
+          table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+          }
+
+          .servoraMobileTopbar {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 60;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #f3f4f6;
+            border-bottom: 1px solid #e5e7eb;
+            box-sizing: border-box;
+          }
+
+          .servoraMobileRestaurantName {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .servoraMobileMenuButton {
+            flex: 0 0 auto;
+            padding: 8px 12px;
+            background: #111827;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            user-select: none;
+          }
+
+          .servoraMobileBackdrop {
+            display: block;
+            position: fixed;
+            inset: 0;
+            z-index: 55;
+            background: rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+          }
+
+          #servoraSidebarToggle:checked ~ .servoraMobileBackdrop {
+            opacity: 1;
+            pointer-events: auto;
+          }
+
+          .servoraSidebar {
+            transform: translateX(-260px) !important;
+            top: 56px !important;
+            height: calc(100vh - 56px) !important;
+            z-index: 56;
+          }
+
+          #servoraSidebarToggle:checked ~ .servoraSidebar {
+            transform: translateX(0) !important;
+          }
+
+          .servoraMain {
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding-top: 84px !important; /* reserve space for the fixed top bar */
+          }
+
+          /* Shared page responsive helpers (opt-in via className). */
+          .servoraStackMobile {
+            grid-template-columns: 1fr !important;
+          }
+
+          .servoraFormFullWidthMobile {
+            width: 100% !important;
+            max-width: none !important;
+            box-sizing: border-box !important;
+          }
+
+          .servoraFullWidthMobileInput {
+            width: 100% !important;
+            max-width: none !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+          }
+
+          .servoraNoRightMarginMobile {
+            margin-right: 0 !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

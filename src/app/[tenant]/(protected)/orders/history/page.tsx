@@ -45,7 +45,7 @@ export default async function OrderHistoryPage({ params }: Props) {
         <p style={{ color: "#777" }}>No past orders</p>
       )}
 
-      <div style={{ display: "grid", gap: "15px" }}>
+      <div className="servoraStackMobile" style={{ display: "grid", gap: "15px" }}>
         {orders.map((order: any) => (
           <div
             key={order.id}

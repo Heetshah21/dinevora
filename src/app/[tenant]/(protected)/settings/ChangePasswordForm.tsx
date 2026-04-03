@@ -34,12 +34,17 @@ export default function ChangePasswordForm({ tenant }: { tenant: string }) {
         padding: "16px",
         maxWidth: "720px",
       }}
+      className="servoraFormFullWidthMobile"
     >
       <h2 style={{ marginBottom: "12px", fontSize: "18px" }}>
         Change Password
       </h2>
 
-      <form action={handleSubmit} style={{ display: "grid", gap: "12px", maxWidth: "400px" }}>
+      <form
+        action={handleSubmit}
+        className="servoraStackMobile servoraFormFullWidthMobile"
+        style={{ display: "grid", gap: "12px", maxWidth: "400px" }}
+      >
         
         <div style={{ position: "relative" }}>
           <input

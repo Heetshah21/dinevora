@@ -24,6 +24,7 @@ export default async function SettingsPage({ params }: Props) {
       <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Restaurant Settings</h1>
 
       <form
+        className="servoraStackMobile servoraFormFullWidthMobile"
         action={async (formData: FormData) => {
           "use server";
           await updateRestaurantSettings(tenant, formData);
@@ -47,6 +48,7 @@ export default async function SettingsPage({ params }: Props) {
           <input
             name="name"
             defaultValue={restaurant?.name || ""}
+            className="servoraFullWidthMobileInput"
             style={{
               width: "100%",
               maxWidth: "480px",
@@ -64,6 +66,7 @@ export default async function SettingsPage({ params }: Props) {
           <input
             name="currency"
             defaultValue={restaurant?.currency || "INR"}
+            className="servoraFullWidthMobileInput"
             style={{
               width: "100%",
               maxWidth: "240px",
@@ -83,6 +86,7 @@ export default async function SettingsPage({ params }: Props) {
             type="number"
             step="0.01"
             defaultValue={restaurant?.taxPercent?.toString() || "0"}
+            className="servoraFullWidthMobileInput"
             style={{
               width: "100%",
               maxWidth: "240px",
@@ -102,6 +106,7 @@ export default async function SettingsPage({ params }: Props) {
             type="number"
             step="0.01"
             defaultValue={restaurant?.servicePercent?.toString() || "0"}
+            className="servoraFullWidthMobileInput"
             style={{
               width: "100%",
               maxWidth: "240px",
@@ -126,6 +131,7 @@ export default async function SettingsPage({ params }: Props) {
         <input
           name="phone"
           defaultValue={restaurant?.phone || ""}
+          className="servoraFullWidthMobileInput"
           style={{
             width: "100%",
             maxWidth: "300px",
@@ -143,6 +149,7 @@ export default async function SettingsPage({ params }: Props) {
         <input
           name="upiId"
           defaultValue={restaurant?.upiId || ""}
+          className="servoraFullWidthMobileInput"
           style={{
             width: "100%",
             maxWidth: "300px",

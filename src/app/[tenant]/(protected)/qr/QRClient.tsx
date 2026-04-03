@@ -34,6 +34,7 @@ export default function QRClient({ shortCode }: { shortCode: string }) {
         placeholder="Number of Tables"
         value={count}
         onChange={(e) => setCount(e.target.value)}
+        className="servoraFullWidthMobileInput servoraNoRightMarginMobile"
         style={{ padding: "10px", marginRight: "10px" }}
       />
 

@@ -38,6 +38,7 @@ export default async function KitchenPage({ params }: Props) {
       <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Kitchen Board</h1>
 
       <div
+        className="servoraStackMobile"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",

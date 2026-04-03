@@ -103,6 +103,7 @@ export default async function DashboardPage({ params }: Props) {
       </h1>
 
       <div
+        className="servoraStackMobile"
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",

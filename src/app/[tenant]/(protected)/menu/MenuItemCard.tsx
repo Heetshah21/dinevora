@@ -27,6 +27,7 @@ export default function MenuItemCard({ item, tenant }: Props) {
           setEditing(false);
         }}
         encType="multipart/form-data"
+        className="servoraFormFullWidthMobile"
         style={{
           border: "1px solid #e5e7eb",
           padding: "14px",
@@ -39,6 +40,7 @@ export default function MenuItemCard({ item, tenant }: Props) {
           name="name"
           defaultValue={item.name}
           required
+          className="servoraFullWidthMobileInput"
           style={{
             marginRight: "8px",
             padding: "10px 12px",
@@ -52,7 +54,12 @@ export default function MenuItemCard({ item, tenant }: Props) {
         <div style={{ marginTop: "8px" }}>
         <label>Update Image</label>
         <br />
-        <input type="file" name="image" accept="image/*" />
+        <input
+          type="file"
+          name="image"
+          accept="image/*"
+          className="servoraFullWidthMobileInput"
+        />
       </div>
               
         <input
@@ -60,6 +67,7 @@ export default function MenuItemCard({ item, tenant }: Props) {
           type="number"
           step="0.01"
           defaultValue={item.price}
+          className="servoraFullWidthMobileInput"
           style={{
             padding: "10px 12px",
             borderRadius: "8px",
@@ -72,6 +80,7 @@ export default function MenuItemCard({ item, tenant }: Props) {
         <input
           name="description"
           defaultValue={item.description || ""}
+          className="servoraFullWidthMobileInput"
           style={{
             padding: "10px 12px",
             borderRadius: "8px",

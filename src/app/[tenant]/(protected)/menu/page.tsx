@@ -29,6 +29,7 @@ export default async function MenuPage({ params }: Props) {
     <div>
       <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>Menu Management</h1>
       <form
+        className="servoraFormFullWidthMobile"
         action={async (formData: FormData) => {
           "use server";
           await createCategory(tenant, formData);
@@ -50,6 +51,7 @@ export default async function MenuPage({ params }: Props) {
           type="text"
           name="name"
           placeholder="New Category Name"
+          className="servoraFullWidthMobileInput"
           style={{
             padding: "10px 12px",
             borderRadius: "8px",
@@ -91,6 +93,7 @@ export default async function MenuPage({ params }: Props) {
         >
           <h2 style={{ margin: "0 0 14px", fontSize: "20px", color: "#111827" }}>{category.name}</h2>
           <form
+            className="servoraStackMobile servoraFormFullWidthMobile"
             action={async (formData: FormData) => {
               "use server";
               await createMenuItem(tenant, formData);
