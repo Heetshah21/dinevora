@@ -1,20 +1,19 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/require-auth";
 import { revalidatePath } from "next/cache";
-import { OrderStatus } from "@prisma/client";
+
 export async function updateKitchenOrderStatus(
   tenant: string,
   orderId: string,
-  status: OrderStatus
+  status: any
 ) {
+  const session = await requireAuth(tenant);
+
   await db.order.update({
-    where: {
-      id: orderId,
-    },
-    data: {
-      status: status,
-    },
+    where: { id: orderId },
+    data: { status },
   });
 
   revalidatePath(`/${tenant}/kitchen`);

@@ -17,16 +17,12 @@ export async function createTestOrder(tenant: string) {
     take: 2,
   });
 
-  if (items.length === 0) {
-    throw new Error("No menu items available to create order");
-  }
-
   const subtotal = items.reduce(
     (sum, item) => sum + Number(item.price),
     0
   );
 
-  const order = await db.order.create({
+  await db.order.create({
     data: {
       tenantId: session.user.tenantId,
       restaurantId: session.user.restaurantId,
@@ -48,47 +44,43 @@ export async function createTestOrder(tenant: string) {
   });
 
   revalidatePath(`/${tenant}/orders`);
-
-  return order;
 }
+
 export async function updateOrderStatus(
-    tenant: string,
-    formData: FormData
-  ) {
-    const session = await requireAuth(tenant);
-  
-    const orderId = formData.get("orderId") as string;
-    const status = formData.get("status") as any;
-  
-    await db.order.update({
-      where: {
-        id: orderId,
-      },
-      data: {
-        status,
-      },
-    });
-  
-    revalidatePath(`/${tenant}/orders`);
-  }
-  export async function markOrderPaid(tenant: string, formData: FormData) {
-    const session = await requireAuth(tenant);
-  
-    const orderId = formData.get("orderId") as string;
-    const amount = formData.get("amount") as string;
-  
-    await db.payment.create({
-      data: {
-        tenantId: session.user.tenantId,
-        orderId: orderId,
-        status: "CAPTURED",
-        method: "CASH",
-        amount: amount,
-        currency: "INR",
-        paidAt: new Date(),
-      },
-    });
-  
-    revalidatePath(`/${tenant}/orders`);
-    revalidatePath(`/${tenant}/orders/history`);
-  }
+  tenant: string,
+  formData: FormData
+) {
+  const session = await requireAuth(tenant);
+
+  const orderId = formData.get("orderId") as string;
+  const status = formData.get("status") as any;
+
+  await db.order.update({
+    where: { id: orderId },
+    data: { status },
+  });
+
+  revalidatePath(`/${tenant}/orders`);
+}
+
+export async function markOrderPaid(tenant: string, formData: FormData) {
+  const session = await requireAuth(tenant);
+
+  const orderId = formData.get("orderId") as string;
+  const amount = formData.get("amount") as string;
+
+  await db.payment.create({
+    data: {
+      tenantId: session.user.tenantId,
+      orderId: orderId,
+      status: "CAPTURED",
+      method: "CASH",
+      amount: amount,
+      currency: "INR",
+      paidAt: new Date(),
+    },
+  });
+
+  revalidatePath(`/${tenant}/orders`);
+  revalidatePath(`/${tenant}/orders/history`);
+}
