@@ -2,7 +2,7 @@ export const revalidate = 10;
 import { requireAuth } from "@/lib/require-auth";
 import { db } from "@/lib/db";
 import { updateRestaurantSettings } from "./actions";
-
+import { changePassword } from "./password-actions";
 interface Props {
   params: Promise<{ tenant: string }>;
 }
@@ -180,6 +180,81 @@ export default async function SettingsPage({ params }: Props) {
           Accept Delivery
         </label>
       </div>
+      <div
+  style={{
+    marginTop: "30px",
+    background: "#fff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "10px",
+    padding: "16px",
+    maxWidth: "720px",
+  }}
+>
+  <h2 style={{ marginBottom: "12px", fontSize: "18px" }}>
+    Change Password
+  </h2>
+
+  <form
+    action={async (formData: FormData) => {
+      "use server";
+      await changePassword(tenant, formData);
+    }}
+    style={{ display: "grid", gap: "12px", maxWidth: "400px" }}
+  >
+    <input
+      type="password"
+      name="currentPassword"
+      placeholder="Current Password"
+      style={{
+        padding: "10px 12px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+      }}
+      required
+    />
+
+    <input
+      type="password"
+      name="newPassword"
+      placeholder="New Password"
+      style={{
+        padding: "10px 12px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+      }}
+      required
+    />
+
+    <input
+      type="password"
+      name="confirmPassword"
+      placeholder="Confirm New Password"
+      style={{
+        padding: "10px 12px",
+        borderRadius: "8px",
+        border: "1px solid #d1d5db",
+      }}
+      required
+    />
+
+    <button
+      type="submit"
+      style={{
+        padding: "10px 14px",
+        borderRadius: "8px",
+        border: "none",
+        background: "#111827",
+        color: "#fff",
+        cursor: "pointer",
+        fontSize: "14px",
+        fontWeight: 500,
+        width: "fit-content",
+      }}
+    >
+      Change Password
+    </button>
+  </form>
+</div>
 
         <button
           type="submit"

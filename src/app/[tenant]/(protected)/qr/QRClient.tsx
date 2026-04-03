@@ -37,7 +37,15 @@ export default function QRClient({ shortCode }: { shortCode: string }) {
         style={{ padding: "10px", marginRight: "10px" }}
       />
 
-      <button onClick={generateQR}>Generate QR Codes</button>
+      <button onClick={generateQR} style={{
+              padding: "8px 12px",
+              background: "#111827",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "13px",
+            }}>Generate QR Codes</button>
 
       <div style={{ marginTop: "30px" }}>
         {qrs.map((q) => (
