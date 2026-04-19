@@ -28,6 +28,4 @@ export async function updateKitchenOrderStatus(
     },
   });
 
-  revalidatePath(`/${tenant}/kitchen`);
-  revalidatePath(`/${tenant}/orders`);
 }

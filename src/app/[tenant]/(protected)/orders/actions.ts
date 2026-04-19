@@ -81,6 +81,4 @@ export async function markOrderPaid(tenant: string, formData: FormData) {
     },
   });
 
-  revalidatePath(`/${tenant}/orders`);
-  revalidatePath(`/${tenant}/orders/history`);
 }
