@@ -7,15 +7,15 @@ export async function GET(req: Request) {
 
   const tenantId = searchParams.get("tenantId");
   const restaurantId = searchParams.get("restaurantId");
-  const type = searchParams.get("type"); // 👈 NEW
+  const type = searchParams.get("type");
 
   if (!tenantId || !restaurantId) {
     return NextResponse.json({ error: "Missing params" });
   }
 
   let statusFilter:
-  | { in: OrderStatus[] }
-  | { not: OrderStatus };
+    | { in: OrderStatus[] }
+    | { not: OrderStatus };
 
   if (type === "kitchen") {
     statusFilter = {
@@ -38,14 +38,22 @@ export async function GET(req: Request) {
       orderCode: true,
       status: true,
       placedAt: true,
+
+      source: true,
+      tableNumber: true,
+      customerName: true,
+      notes: true,
+
       items: {
         select: {
           id: true,
           name: true,
           quantity: true,
+          isJain: true,
+          notes: true,
         },
       },
-    },
+    }, // ✅ FIXED comma here
     orderBy: {
       placedAt: "asc",
     },

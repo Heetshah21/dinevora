@@ -6,6 +6,8 @@ type OrderItem = {
   id: string;
   name: string;
   quantity: number;
+  isJain?: boolean;
+  notes?: string | null;
 };
 
 type OrderStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
@@ -15,6 +17,12 @@ type Order = {
   orderCode: string;
   status: OrderStatus;
   placedAt: string;
+
+  source?: "IN_STORE" | "TAKEAWAY" | "DELIVERY";
+  tableNumber?: string | null;
+  customerName?: string | null;
+  notes?: string | null;
+
   items: OrderItem[];
 };
 
@@ -30,6 +38,7 @@ export default function KitchenClient({
   restaurantId,
 }: Props) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
 
   // 🔁 Polling with stale-data protection
   useEffect(() => {
@@ -40,20 +49,18 @@ export default function KitchenClient({
         );
         const data: Order[] = await res.json();
 
-        setOrders((prev) => {
-          const updated = data.map((newOrder) => {
+        setOrders((prev) =>
+          data.map((newOrder) => {
             const existing = prev.find((o) => o.id === newOrder.id);
 
-            // ✅ Prevent flicker (keep optimistic state if ahead)
+            // prevent flicker (keep optimistic state if ahead)
             if (existing && existing.status !== newOrder.status) {
               return existing;
             }
 
             return newOrder;
-          });
-
-          return updated;
-        });
+          })
+        );
       } catch (err) {
         console.error("Polling failed:", err);
       }
@@ -64,32 +71,32 @@ export default function KitchenClient({
 
   // ⚡ Optimistic update
   const updateStatus = async (orderId: string, status: OrderStatus) => {
-    // store previous state (for rollback)
+    setLoadingIds((prev) => [...prev, orderId]);
+
     let previousState: Order[] = [];
-  
+
     setOrders((prev) => {
       previousState = prev;
       return prev.map((o) =>
         o.id === orderId ? { ...o, status } : o
       );
     });
-  
+
     try {
       const res = await fetch("/api/orders/update", {
         method: "POST",
         body: JSON.stringify({ orderId, status }),
       });
-  
+
       const data = await res.json();
-  
-      if (!data.success) {
-        throw new Error("Update failed");
-      }
+
+      if (!data.success) throw new Error();
     } catch (err) {
       console.error(err);
-  
-      // ❌ rollback UI if failed
-      setOrders(previousState);
+      setOrders(previousState); // rollback
+      alert("Failed to update order");
+    } finally {
+      setLoadingIds((prev) => prev.filter((id) => id !== orderId));
     }
   };
 
@@ -104,8 +111,8 @@ export default function KitchenClient({
         gap: "14px",
       }}
     >
-      <Column title="Pending" orders={pending} updateStatus={updateStatus} />
-      <Column title="Confirmed" orders={confirmed} updateStatus={updateStatus} />
+      <Column title="Pending" orders={pending} updateStatus={updateStatus} loadingIds={loadingIds} />
+      <Column title="Confirmed" orders={confirmed} updateStatus={updateStatus} loadingIds={loadingIds} />
     </div>
   );
 }
@@ -114,10 +121,12 @@ function Column({
   title,
   orders,
   updateStatus,
+  loadingIds,
 }: {
   title: string;
   orders: Order[];
   updateStatus: (id: string, status: OrderStatus) => void;
+  loadingIds: string[];
 }) {
   return (
     <div
@@ -143,43 +152,69 @@ function Column({
         >
           <strong>#{order.orderCode}</strong>
 
+          {/* 🔹 Order Type */}
+          <div style={{ fontSize: "13px", color: "#6b7280", marginTop: "4px" }}>
+            {order.source === "IN_STORE" && (
+              <span>Table: {order.tableNumber || "-"}</span>
+            )}
+            {order.source === "TAKEAWAY" && (
+              <span>Takeaway - {order.customerName || "Guest"}</span>
+            )}
+            {order.source === "DELIVERY" && (
+              <span>Delivery - {order.customerName || "Customer"}</span>
+            )}
+          </div>
+
+          {/* 🔹 Order Notes */}
+          {order.notes && (
+            <div style={{ fontSize: "12px", color: "#374151", marginTop: "4px" }}>
+              Note: {order.notes}
+            </div>
+          )}
+
+          {/* 🔹 Items */}
           <div style={{ marginTop: "8px" }}>
             {order.items.map((item) => (
               <div key={item.id}>
                 {item.quantity}x {item.name}
+
+                {item.isJain && (
+                  <span style={{ marginLeft: 6, color: "#16a34a" }}>
+                    (Jain)
+                  </span>
+                )}
+
+                {item.notes && (
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#6b7280",
+                      marginLeft: "6px",
+                    }}
+                  >
+                    • {item.notes}
+                  </div>
+                )}
               </div>
             ))}
           </div>
 
+          {/* 🔹 Actions */}
           <div style={{ marginTop: "10px", display: "flex", gap: "6px" }}>
             {order.status === "PENDING" && (
               <>
                 <button
+                  disabled={loadingIds.includes(order.id)}
                   onClick={() => updateStatus(order.id, "CONFIRMED")}
-                  style={{
-                    padding: "8px 12px",
-                    background: "#111827",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                  }}
+                  style={btnPrimary}
                 >
                   Accept
                 </button>
 
                 <button
+                  disabled={loadingIds.includes(order.id)}
                   onClick={() => updateStatus(order.id, "CANCELLED")}
-                  style={{
-                    padding: "8px 12px",
-                    background: "#fff",
-                    color: "#111827",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                  }}
+                  style={btnSecondary}
                 >
                   Decline
                 </button>
@@ -188,16 +223,9 @@ function Column({
 
             {order.status === "CONFIRMED" && (
               <button
+                disabled={loadingIds.includes(order.id)}
                 onClick={() => updateStatus(order.id, "COMPLETED")}
-                style={{
-                  padding: "8px 12px",
-                  background: "#16a34a",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "13px",
-                  cursor: "pointer",
-                }}
+                style={btnSuccess}
               >
                 Ready
               </button>
@@ -208,3 +236,31 @@ function Column({
     </div>
   );
 }
+
+// 🎨 Button styles
+const btnPrimary = {
+  padding: "8px 12px",
+  background: "#111827",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+};
+
+const btnSecondary = {
+  padding: "8px 12px",
+  background: "#fff",
+  color: "#111827",
+  border: "1px solid #d1d5db",
+  borderRadius: "8px",
+  cursor: "pointer",
+};
+
+const btnSuccess = {
+  padding: "8px 12px",
+  background: "#16a34a",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  cursor: "pointer",
+};
