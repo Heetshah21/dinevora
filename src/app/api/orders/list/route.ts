@@ -55,7 +55,7 @@ export async function GET(req: Request) {
       },
     }, // ✅ FIXED comma here
     orderBy: {
-      placedAt: "asc",
+      placedAt: type === "kitchen" ? "asc" : "desc",
     },
   });
 
