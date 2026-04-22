@@ -105,24 +105,24 @@ export default function OrdersClient({
 
   // 💰 Mark Paid
   const markPaid = async (order: Order) => {
-    setLoadingIds((prev) => [...prev, order.id]);
-
     try {
       const res = await fetch("/api/orders/pay", {
         method: "POST",
         body: JSON.stringify({
           orderId: order.id,
-          amount: order.total,
+          amount: Number(order.total),
           tenantId,
         }),
       });
-
+  
       const data = await res.json();
+  
       if (!data.success) throw new Error();
+
+      setOrders((prev) => prev.filter((o) => o.id !== order.id));
+  
     } catch {
       alert("Payment failed");
-    } finally {
-      setLoadingIds((prev) => prev.filter((id) => id !== order.id));
     }
   };
 
