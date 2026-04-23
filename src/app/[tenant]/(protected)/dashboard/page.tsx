@@ -107,7 +107,7 @@ export default async function DashboardPage({ params }: Props) {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-          gap: "16px",
+          gap: "15px",
           alignItems: "stretch",
         }}
       >
