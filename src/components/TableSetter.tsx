@@ -8,8 +8,11 @@ export default function TableSetter() {
 
   useEffect(() => {
     const table = searchParams.get("table");
+
     if (table) {
       localStorage.setItem("servora_table", table);
+    } else {
+      localStorage.removeItem("servora_table");
     }
   }, [searchParams]);
 
