@@ -7,12 +7,14 @@ export async function GET(req: Request) {
   const tenantId = searchParams.get("tenantId");
   const restaurantId = searchParams.get("restaurantId");
   const range = searchParams.get("range") || "today";
-
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
   if (!tenantId || !restaurantId) {
     return NextResponse.json({ error: "Missing params" });
   }
 
   const now = new Date();
+    now.setHours(23, 59, 59, 999);
 
   let startDate = new Date();
 
@@ -28,7 +30,20 @@ export async function GET(req: Request) {
   } else if (range === "30d") {
     startDate.setDate(now.getDate() - 29);
     startDate.setHours(0, 0, 0, 0);
-  } else {
+    
+  } 
+  else if (
+    range === "custom" &&
+    from &&
+    to
+  ) {
+    startDate = new Date(from);
+    startDate.setHours(0,0,0,0);
+  
+    now.setTime(new Date(to).getTime());
+    now.setHours(23,59,59,999);
+  }
+  else {
     startDate.setHours(0, 0, 0, 0);
   }
 

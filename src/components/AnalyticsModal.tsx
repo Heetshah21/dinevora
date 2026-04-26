@@ -14,15 +14,28 @@ export default function AnalyticsModal({
   const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState<any>(null);
-
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const loadData = async (selectedRange: string) => {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `/api/dashboard/analytics?tenantId=${tenantId}&restaurantId=${restaurantId}&range=${selectedRange}`,
-        { cache: "no-store" }
-      );
+        let url =
+        `/api/dashboard/analytics?tenantId=${tenantId}` +
+        `&restaurantId=${restaurantId}` +
+        `&range=${selectedRange}`;
+      
+      if (
+        selectedRange === "custom" &&
+        fromDate &&
+        toDate
+      ) {
+        url += `&from=${fromDate}&to=${toDate}`;
+      }
+      
+      const res = await fetch(url, {
+        cache: "no-store",
+      });
 
       const json = await res.json();
 
@@ -46,10 +59,12 @@ export default function AnalyticsModal({
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const val = e.target.value;
-
+  
     setRange(val);
-
-    await loadData(val);
+  
+    if (val !== "custom") {
+      await loadData(val);
+    }
   };
 
   return (
@@ -142,8 +157,57 @@ export default function AnalyticsModal({
               <option value="yesterday">Yesterday</option>
               <option value="7d">Last 7 Days</option>
               <option value="30d">Last 30 Days</option>
+              <option value="custom">Custom Range</option>
             </select>
+            {range === "custom" && (
+  <div
+    style={{
+      display: "grid",
+      gap: "10px",
+      marginBottom: "18px",
+    }}
+  >
+    <input
+      type="date"
+      value={fromDate}
+      onChange={(e) =>
+        setFromDate(e.target.value)
+      }
+      style={{
+        padding: "10px",
+        borderRadius: "10px",
+        border: "1px solid #e5e7eb",
+      }}
+    />
 
+    <input
+      type="date"
+      value={toDate}
+      onChange={(e) =>
+        setToDate(e.target.value)
+      }
+      style={{
+        padding: "10px",
+        borderRadius: "10px",
+        border: "1px solid #e5e7eb",
+      }}
+    />
+
+    <button
+      onClick={() => loadData("custom")}
+      style={{
+        padding: "10px",
+        border: "none",
+        borderRadius: "10px",
+        background: "#111827",
+        color: "white",
+        cursor: "pointer",
+      }}
+    >
+      Apply
+    </button>
+  </div>
+)}
             {loading ? (
               <p>Loading...</p>
             ) : data ? (
