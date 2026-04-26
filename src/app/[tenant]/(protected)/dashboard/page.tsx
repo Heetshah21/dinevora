@@ -2,6 +2,7 @@ export const revalidate = 10;
 
 import { requireAuth } from "@/lib/require-auth";
 import { db } from "@/lib/db";
+import AnalyticsModal from "@/components/AnalyticsModal";
 
 interface Props {
   params: Promise<{ tenant: string }>;
@@ -101,6 +102,10 @@ export default async function DashboardPage({ params }: Props) {
       <h1 style={{ margin: "0 0 20px", fontSize: "28px", color: "#111827" }}>
         Dashboard
       </h1>
+      <AnalyticsModal
+        tenantId={session.user.tenantId}
+        restaurantId={session.user.restaurantId}
+      />
 
       <div
         className="servoraStackMobile"
