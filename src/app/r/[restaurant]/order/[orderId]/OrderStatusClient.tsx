@@ -3,45 +3,126 @@
 import { useEffect, useState } from "react";
 import { useIsMobile } from "@/lib/useIsMobile";
 
-export default function OrderStatusClient({ orderId }: any) {
-  const [order, setOrder] = useState<any>(null);
+type Props = {
+  orderId: string;
+  restaurant?: string;
+};
+
+type OrderItem = {
+  id: string;
+  name: string;
+  quantity: number;
+  notes?: string | null;
+};
+
+type Order = {
+  id: string;
+  orderCode: string;
+  status: string;
+  total: number;
+  items: OrderItem[];
+};
+
+export default function OrderStatusClient({
+  orderId,
+}: Props) {
+  const [order, setOrder] = useState<Order | null>(null);
+  const [error, setError] = useState(false);
+
   const isMobile = useIsMobile();
 
   const loadOrder = async () => {
-    const res = await fetch(`/api/orders/${orderId}`);
-    const data = await res.json();
-    setOrder(data);
+    try {
+      const res = await fetch(
+        `/api/orders/${orderId}?t=${Date.now()}`,
+        {
+          cache: "no-store",
+        }
+      );
+
+      if (!res.ok) {
+        setError(true);
+        return;
+      }
+
+      const data = await res.json();
+
+      setOrder(data);
+      setError(false);
+    } catch (err) {
+      console.error("ORDER STATUS LOAD ERROR:", err);
+      setError(true);
+    }
   };
 
   useEffect(() => {
     loadOrder();
-    const interval = setInterval(loadOrder, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
-  if (!order)
+    const interval = setInterval(loadOrder, 3000);
+
+    return () => clearInterval(interval);
+  }, [orderId]);
+
+  if (error) {
     return (
-      <p style={{ padding: "20px", textAlign: "center" }}>Loading...</p>
+      <p
+        style={{
+          padding: "20px",
+          textAlign: "center",
+          color: "#dc2626",
+          fontWeight: 600,
+        }}
+      >
+        Failed to load order status
+      </p>
     );
+  }
+
+  if (!order) {
+    return (
+      <p style={{ padding: "20px", textAlign: "center" }}>
+        Loading order status...
+      </p>
+    );
+  }
 
   const displayStatus =
-  order.status === "PAID"
-    ? "PAID"
-    : order.status === "COMPLETED"
-    ? "DONE"
-    : order.status;
+    order.status === "PAID"
+      ? "PAID"
+      : order.status === "COMPLETED"
+      ? "DONE"
+      : order.status;
 
   const steps = ["PENDING", "CONFIRMED", "DONE", "PAID"];
-  const currentStepIndex = Math.max(0, steps.indexOf(displayStatus));
+  const currentStepIndex = Math.max(
+    0,
+    steps.indexOf(displayStatus)
+  );
 
   const statusTone =
     displayStatus === "PAID"
-      ? { bg: "#ecfdf3", border: "#bbf7d0", fg: "#166534" }
+      ? {
+          bg: "#ecfdf3",
+          border: "#bbf7d0",
+          fg: "#166534",
+        }
       : displayStatus === "DONE"
-      ? { bg: "#eff6ff", border: "#bfdbfe", fg: "#1d4ed8" }
+      ? {
+          bg: "#eff6ff",
+          border: "#bfdbfe",
+          fg: "#1d4ed8",
+        }
       : displayStatus === "CONFIRMED"
-      ? { bg: "#fff7ed", border: "#fed7aa", fg: "#9a3412" }
-      : { bg: "#f3f4f6", border: "#e5e7eb", fg: "#374151" };
+      ? {
+          bg: "#fff7ed",
+          border: "#fed7aa",
+          fg: "#9a3412",
+        }
+      : {
+          bg: "#f3f4f6",
+          border: "#e5e7eb",
+          fg: "#374151",
+        };
 
   const stepLabels: Record<string, string> = {
     PENDING: "Order Placed",
@@ -59,7 +140,14 @@ export default function OrderStatusClient({ orderId }: any) {
         boxSizing: "border-box",
       }}
     >
-      <div style={{ maxWidth: "760px", margin: "0 auto", width: "100%" }}>
+      <div
+        style={{
+          maxWidth: "760px",
+          margin: "0 auto",
+          width: "100%",
+        }}
+      >
+        {/* Header */}
         <div
           style={{
             borderRadius: "16px",
@@ -91,6 +179,7 @@ export default function OrderStatusClient({ orderId }: any) {
               >
                 Order
               </div>
+
               <div
                 style={{
                   fontSize: isMobile ? "22px" : "26px",
@@ -139,15 +228,28 @@ export default function OrderStatusClient({ orderId }: any) {
                 gap: "10px",
               }}
             >
-              {steps.map((s, idx) => {
+              {steps.map((step, idx) => {
                 const isDone = idx < currentStepIndex;
-                const isCurrent = idx === currentStepIndex;
-                const dotBg = isCurrent || isDone ? "#111827" : "#e5e7eb";
-                const lineBg = isDone ? "#111827" : "#e5e7eb";
+                const isCurrent =
+                  idx === currentStepIndex;
+
+                const dotBg =
+                  isCurrent || isDone
+                    ? "#111827"
+                    : "#e5e7eb";
+
+                const lineBg = isDone
+                  ? "#111827"
+                  : "#e5e7eb";
 
                 return (
-                  <div key={s}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
+                  <div key={step}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
                       <div
                         style={{
                           width: "10px",
@@ -159,6 +261,7 @@ export default function OrderStatusClient({ orderId }: any) {
                             : "none",
                         }}
                       />
+
                       {idx < steps.length - 1 && (
                         <div
                           style={{
@@ -171,15 +274,20 @@ export default function OrderStatusClient({ orderId }: any) {
                         />
                       )}
                     </div>
+
                     <div
                       style={{
                         marginTop: "8px",
                         fontSize: "11px",
-                        fontWeight: isCurrent ? 800 : 700,
-                        color: isCurrent ? "#111827" : "#6b7280",
+                        fontWeight: isCurrent
+                          ? 800
+                          : 700,
+                        color: isCurrent
+                          ? "#111827"
+                          : "#6b7280",
                       }}
                     >
-                      {stepLabels[s]}
+                      {stepLabels[step]}
                     </div>
                   </div>
                 );
@@ -208,8 +316,13 @@ export default function OrderStatusClient({ orderId }: any) {
               Items
             </div>
 
-            <div style={{ display: "grid", gap: "10px" }}>
-              {order.items.map((item: any) => (
+            <div
+              style={{
+                display: "grid",
+                gap: "10px",
+              }}
+            >
+              {order.items.map((item) => (
                 <div
                   key={item.id}
                   style={{
@@ -219,12 +332,19 @@ export default function OrderStatusClient({ orderId }: any) {
                 >
                   <div>
                     {item.name}
+
                     {item.notes && (
-                      <div style={{ fontSize: "12px", color: "#6b7280" }}>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#6b7280",
+                        }}
+                      >
                         Note: {item.notes}
                       </div>
                     )}
                   </div>
+
                   <div>× {item.quantity}</div>
                 </div>
               ))}
@@ -244,7 +364,10 @@ export default function OrderStatusClient({ orderId }: any) {
             }}
           >
             <div>Total</div>
-            <div style={{ fontWeight: 900 }}>₹{order.total}</div>
+
+            <div style={{ fontWeight: 900 }}>
+              ₹{order.total}
+            </div>
           </div>
         </div>
       </div>
