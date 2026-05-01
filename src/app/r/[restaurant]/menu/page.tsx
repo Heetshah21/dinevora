@@ -150,25 +150,43 @@ export default async function CustomerMenuPage({
                   </div>
 
                   <div
-                      className="menu-item-add-wrap"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "flex-end",
-                        flex: "0 0 auto",
-                        marginLeft: "auto",
-                      }}
-                    >
-                    <AddToCartButton
-                      item={{
-                        id: item.id,
-                        name: item.name,
-                        price: Number(item.price),
-                        imageUrl: item.imageUrl,
-                        isJainAvailable: item.isJainAvailable,
-                      }}
-                    />
-                  </div>
+  style={{
+    flex: 1,
+    minWidth: 0,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "12px",
+  }}
+>
+  {/* LEFT SIDE */}
+  <div style={{ flex: 1 }}>
+    <strong style={{ fontSize: "15px" }}>
+      {item.name}
+    </strong>
+
+    {item.description && (
+      <p style={{ fontSize: "13px" }}>
+        {item.description}
+      </p>
+    )}
+
+    <div style={{ fontWeight: 700 }}>
+      ₹{item.price}
+    </div>
+  </div>
+
+  {/* RIGHT SIDE BUTTON */}
+  <AddToCartButton
+    item={{
+      id: item.id,
+      name: item.name,
+      price: Number(item.price),
+      imageUrl: item.imageUrl,
+      isJainAvailable: item.isJainAvailable,
+    }}
+  />
+</div>
                 </div>
               ))}
             </div>
