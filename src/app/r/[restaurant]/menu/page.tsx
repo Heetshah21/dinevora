@@ -149,7 +149,16 @@ export default async function CustomerMenuPage({
                     </div>
                   </div>
 
-                  <div className="menu-item-add-wrap" style={{ display: "flex", alignItems: "center", paddingLeft: "2px" }}>
+                  <div
+                    className="menu-item-add-wrap"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      width: "100%",
+                      marginTop: "8px",
+                    }}
+                  >
                     <AddToCartButton
                       item={{
                         id: item.id,
