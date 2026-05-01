@@ -112,7 +112,7 @@ export default async function CustomerMenuPage({
                   )}
 
                   <div className="menu-item-body" style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", flexWrap: "nowrap" }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <strong style={{ display: "block", color: "#111827", fontSize: "15px" }}>
                           {item.name}
