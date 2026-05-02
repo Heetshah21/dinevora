@@ -8,7 +8,7 @@ export default function AddToCartButton({ item }: any) {
   const [showModal, setShowModal] = useState(false);
   const [qty, setQty] = useState(0);
 
-  // Sync quantity from cart on load + updates
+  // Sync quantity from cart
   useEffect(() => {
     const updateQty = () => {
       const items = getCart();
@@ -44,7 +44,7 @@ export default function AddToCartButton({ item }: any) {
     }
   };
 
-  // 🔥 UI SWITCH
+  // 🔥 ADD BUTTON
   if (qty === 0) {
     return (
       <>
@@ -52,14 +52,18 @@ export default function AddToCartButton({ item }: any) {
           type="button"
           onClick={handleAdd}
           style={{
-            padding: "6px 12px",
+            padding: "8px 16px",
+            minWidth: "72px",              // prevents layout jump
+            textAlign: "center",
             background: "#111827",
             color: "white",
             border: "none",
-            borderRadius: "8px",
-            fontSize: "13px",
+            borderRadius: "10px",
+            fontSize: "14px",
             cursor: "pointer",
             fontWeight: 600,
+            touchAction: "manipulation", // better mobile tap
+            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
           }}
         >
           Add
@@ -75,17 +79,20 @@ export default function AddToCartButton({ item }: any) {
     );
   }
 
+  // 🔥 QUANTITY CONTROLS
   return (
     <div
       style={{
         display: "flex",
         alignItems: "center",
         gap: "6px",
-        background: "#f3f4f6",
+        background: "#eef2ff",                // matches category theme
+        border: "1px solid #c7d2fe",
         borderRadius: "10px",
         padding: "4px 6px",
       }}
     >
+      {/* MINUS */}
       <button
         onClick={() => {
           removeFromCart(item.id, false);
@@ -94,30 +101,43 @@ export default function AddToCartButton({ item }: any) {
         style={{
           border: "none",
           background: "white",
-          width: "26px",
-          height: "26px",
+          width: "32px",
+          height: "32px",
           borderRadius: "6px",
           cursor: "pointer",
-          fontWeight: "bold",
+          fontSize: "18px",
+          fontWeight: 600,
+          touchAction: "manipulation",
         }}
       >
-        -
+        −
       </button>
 
-      <span style={{ fontWeight: 600, minWidth: "16px", textAlign: "center" }}>
+      {/* QTY */}
+      <span
+        style={{
+          fontWeight: 600,
+          minWidth: "20px",
+          textAlign: "center",
+          fontSize: "14px",
+        }}
+      >
         {qty}
       </span>
 
+      {/* PLUS */}
       <button
         onClick={handleAdd}
         style={{
           border: "none",
           background: "white",
-          width: "26px",
-          height: "26px",
+          width: "32px",
+          height: "32px",
           borderRadius: "6px",
           cursor: "pointer",
-          fontWeight: "bold",
+          fontSize: "18px",
+          fontWeight: 600,
+          touchAction: "manipulation",
         }}
       >
         +

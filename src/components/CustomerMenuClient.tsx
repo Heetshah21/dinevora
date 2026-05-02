@@ -23,7 +23,7 @@ export default function CustomerMenuClient({ categories }: any) {
               style={{
                 cursor: "pointer",
                 padding: "12px",
-                background: "#ffffff",
+                background: "#eef2ff",
                 borderRadius: "10px",
                 border: "1px solid #e5e7eb",
                 display: "flex",
