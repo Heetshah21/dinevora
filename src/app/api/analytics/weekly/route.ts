@@ -13,59 +13,72 @@ export async function GET(req: Request) {
 
   const now = new Date();
 
-  // Get Monday of current week
-  const day = now.getDay(); // 0 = Sun
+  const day = now.getDay();
   const diff = day === 0 ? -6 : 1 - day;
 
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() + diff);
   startOfWeek.setHours(0, 0, 0, 0);
 
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  // 🔥 ONE QUERY FOR ORDERS
+  const orders = await db.order.findMany({
+    where: {
+      tenantId,
+      restaurantId,
+      placedAt: {
+        gte: startOfWeek,
+        lte: endOfWeek,
+      },
+    },
+    select: {
+      placedAt: true,
+    },
+  });
+
+  // 🔥 ONE QUERY FOR PAYMENTS
+  const payments = await db.payment.findMany({
+    where: {
+      tenantId,
+      status: "CAPTURED",
+      order: {
+        restaurantId,
+      },
+      paidAt: {
+        gte: startOfWeek,
+        lte: endOfWeek,
+      },
+    },
+    select: {
+      paidAt: true,
+      amount: true,
+    },
+  });
+
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  const ordersData = [];
-  const revenueData = [];
+  const ordersData = Array(7).fill(0);
+  const revenueData = Array(7).fill(0);
 
-  for (let i = 0; i < 7; i++) {
-    const start = new Date(startOfWeek);
-    start.setDate(startOfWeek.getDate() + i);
+  // 🔥 GROUP IN MEMORY (FAST)
+  orders.forEach((o) => {
+    if (!o.placedAt) return; // 🔥 fix
+  
+    const d = new Date(o.placedAt);
+    const index = (d.getDay() + 6) % 7;
+    ordersData[index]++;
+  });
 
-    const end = new Date(start);
-    end.setHours(23, 59, 59, 999);
-
-    // Orders count
-    const orders = await db.order.count({
-      where: {
-        tenantId,
-        restaurantId,
-        placedAt: {
-          gte: start,
-          lte: end,
-        },
-      },
-    });
-
-    // Revenue (only captured payments)
-    const revenue = await db.payment.aggregate({
-      where: {
-        tenantId,
-        status: "CAPTURED",
-        order: {
-          restaurantId,
-        },
-        paidAt: {
-          gte: start,
-          lte: end,
-        },
-      },
-      _sum: {
-        amount: true,
-      },
-    });
-
-    ordersData.push(orders);
-    revenueData.push(Number(revenue._sum.amount ?? 0));
-  }
+  payments.forEach((p) => {
+    if (!p.paidAt) return; // 🔥 fix
+  
+    const d = new Date(p.paidAt);
+    const index = (d.getDay() + 6) % 7;
+    revenueData[index] += Number(p.amount);
+  });
 
   return NextResponse.json({
     labels: days,
