@@ -3,6 +3,7 @@ export const revalidate = 10;
 import { requireAuth } from "@/lib/require-auth";
 import { db } from "@/lib/db";
 import AnalyticsModal from "@/components/AnalyticsModal";
+import WeeklyAnalytics from "@/components/WeeklyAnalytics";
 
 interface Props {
   params: Promise<{ tenant: string }>;
@@ -135,7 +136,11 @@ export default async function DashboardPage({ params }: Props) {
           <Card title="Delivery Orders" value={deliveryOrders} />
         )}
       </div>
-    </div>
+    <WeeklyAnalytics
+    tenantId={session.user.tenantId}
+    restaurantId={session.user.restaurantId}
+  />
+  </div>
   );
 }
 
@@ -176,5 +181,6 @@ function Card({ title, value }: any) {
         {value}
       </h2>
     </div>
+    
   );
 }
